@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>A&M {% block title %}{% endblock %}</title>
+        <link rel="stylesheet" href="{{ asset('assets/css/base.css') }}">
+        {% block stylesheets %}
+        {% endblock %}
+        <script src="{{ asset('assets/js/jquery-3.3.1.min.js') }}"></script>
+        {% block js_src %}{% endblock %}
+    </head>
+    <body>
+        {% block body %}{% endblock %}
+        {% block js_end %}{% endblock %}
+    </body>
+</html>

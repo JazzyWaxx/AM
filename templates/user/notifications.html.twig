@@ -1,0 +1,54 @@
+{% extends 'user/base.html.twig' %}
+
+{% block title %}Amis{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/user/base.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/user/notifications.css') }}">
+{% endblock %}
+
+{% block js_src %}
+{% endblock %}
+
+{% block body %}
+
+    <div class="square-1 list all-notifications">
+        <div class="list-title">Notifications</div>
+        <ul>
+            {% if notifications is not empty %}
+                {% for notification in notifications %}
+                    <li>
+                        <a href="{{ path('user_notifications', {'id': notification.id}) }}">
+                            <p><span class="">{{ notification.subject }}</span><br/></p>
+                            <span class="date">{{ notification.createdAt | date("d M Y") }}</span>
+                        </a>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <li>
+                    <a href="#">
+                        <p><span class="">Aucune notification pour le moment</span><br/></p>
+                        <span class="date"></span>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+    <div class="square-1 list notification">
+        {% if notification is not null %}
+            <div class="list-title">
+                {{ notification.subject }}
+                <div>
+                    <a href="{{ path('user_notification_delete', {'id': notification.id}) }}"><i class="fas fa-trash"></i></a>
+                </div>
+            </div>
+            <div class="notification-content">
+                <span class="date">{{ notification.createdAt | date("d M Y h:i") }}</span><br/>
+                {{ notification.content }}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block js_end %}
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{% endblock %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/home/home.css') }}">
+{% endblock %}
+{% block js_src %}{% endblock %}
+
+{% block body %}
+    {% include '/home/header.html.twig' %}
+
+    <div class="access-game">
+        <a class="a-login" href="{{ path('security_login') }}">Connexion</a>
+        <a class="a-signup" href="{{ path('security_signup') }}">Inscription</a>
+    </div>
+
+    {% include '/home/footer.html.twig' %}
+{% endblock %}
+
+{% block js_end %}
+    <script>
+        $( document ).ready(function() {
+
+            $('.logo-game').height($('.logo-game').parent().height() - 100);
+        });
+    </script>
+
+{% endblock %}

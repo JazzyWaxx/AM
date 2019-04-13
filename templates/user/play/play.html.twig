@@ -1,0 +1,66 @@
+{% extends 'user/base.html.twig' %}
+
+{% block title %}Jouer{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/user/base.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/user/play/play.css') }}">
+{% endblock %}
+
+{% block js_src %}
+{% endblock %}
+
+{% block body %}
+
+    <div class="square-1 other-1">
+
+        <div class="square-2 create">
+            <div class="square-wrapper">
+                <a href="{{ path('user_play_create') }}">Créer</a>
+            </div>
+        </div>
+        <div class="square-2 join">
+            <div class="square-wrapper">
+                <a href="">Rejoindre</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="square-1 list resume">
+        <div class="list-title">Reprendre une partie</div>
+        <ul>
+            {% if games is not empty %}
+                {% for game in games %}
+                    <li>
+                        <div class="user-username">
+                            n°{{ game.id }}
+                            <small class="date">{{ game.endedAt | date("d M h:i") }}</small>
+                        </div>
+                        <div class="opponent">
+                            {% if game.opponent is not null %}
+                                vs: {{ game.opponent }}
+                            {% else %}
+                                Pas encore d'adversaire
+                            {% endif %}
+                        </div>
+
+                        <div class="action">
+                            <a href="{{ path('game_field', {'game': game.id}) }}"><i class="fas fa-play-circle"></i></a>
+                        </div>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <li>
+                    <div class="user-username">
+                        Aucune partie pour l'instant
+                        <small class="last-connected"></small>
+                    </div>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+
+{% endblock %}
+
+{% block js_end %}
+{% endblock %}

@@ -1,0 +1,43 @@
+.create .square-wrapper {
+    background-color: rgba(247, 175, 66, 1);
+}
+
+/*.create .square-wrapper:hover {
+    background-color: rgba(247, 175, 66, 0.3);
+}*/
+
+.join .square-wrapper {
+    background-color: rgba(247, 175, 66, 1);
+}
+
+/*
+.join .square-wrapper:hover {
+    background-color: rgba(247, 175, 66, 0.3);
+}*/
+
+.list {
+    background-color: #f7c342;
+}
+
+.list-title {
+    background-color: #F7AF42;
+}
+
+.list ul li {
+    color: #353754;
+}
+
+.user-username {
+    display: flex;
+    align-items: center;
+}
+
+.date {
+    margin-left: 0.4vw;
+    font-size: 0.6vw;
+    color: #8184b0;
+}
+
+.opponent {
+    font-size: 0.8vw;
+}

@@ -1,0 +1,123 @@
+.content-filter {
+    padding: 10px;
+}
+
+.content-filter form *, .content-list {
+    font-size: 12px;
+}
+
+.content-filter form {
+    display: flex;
+    justify-content: space-between;
+}
+
+.content-filter input {
+    width: 400px;
+    padding: 10px;
+    font-family: "Viga", cursive;
+    background-color: #f3f3f6;
+    border: 1px solid #e3e3e3;
+    outline: none;
+    transition: background-color 0.1s ease-in-out;
+}
+
+.content-filter input:focus {
+    background-color: #fbfbfc;
+}
+
+.content-filter select {
+    width: 300px;
+    padding: 10px;
+    font-family: "Viga", cursive;
+    background-color: #f3f3f6;
+    border: 1px solid #e3e3e3;
+    outline: none;
+}
+
+.content-filter, .content-list {
+    width: 100%;
+    margin-bottom: 20px;
+    background-color: white;
+    border: var(--main-border-block);
+}
+
+.content-list {
+    background-color: transparent;
+}
+
+table a {
+    transition: color 0.2s ease-in;
+}
+
+table a:hover {
+    color: #504D6C;
+}
+
+table {
+    font-family: "Viga", cursive;
+    background-color: white;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead, tfoot {
+    font-size: 16px;
+}
+
+tbody {
+    font-size: 13px;
+}
+
+thead {
+    border-bottom: var(--main-border-block);
+}
+
+tfoot {
+    border-top: var(--main-border-block);
+}
+
+table thead td, table tfoot td {
+    padding: 10px;
+    font-size: 14px;
+    color: #353754;
+}
+
+table tbody td {
+    padding: 10px;
+    color: #a4a6c5;
+}
+
+table tbody tr:nth-child(even) {
+    background-color: #fbfbfc;
+}
+
+table tbody tr:nth-child(odd) {
+    background-color: #f3f3f6;
+}
+
+.action {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: 10px;
+    opacity: 0;
+    transition: opacity 0.1s ease-in;
+}
+
+table tbody tr:hover .action {
+    opacity: 1;
+}
+
+.action li:not(:last-child) {
+    margin-right: 8px;
+}
+
+.action li {
+    transition: color 0.1s ease-in-out;
+    font-size: 11px;
+}
+
+/*
+.action li:hover {
+    color: #504D6C;
+}*/

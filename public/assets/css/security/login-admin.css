@@ -1,0 +1,23 @@
+form label {
+    display: none;
+}
+
+.admin-login-link {
+    position: absolute;
+    bottom: 0;
+    margin: auto;
+    width: 100%;
+    font-family: 'Lilita One', cursive;
+    font-size: 18px;
+    background-color: #CF2F3F;
+    outline: none;
+    display: flex;
+}
+
+.admin-login-link a {
+    color: #FFFFFF;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+}

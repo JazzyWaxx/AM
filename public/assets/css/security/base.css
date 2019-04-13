@@ -1,0 +1,114 @@
+@font-face {
+    font-family: "KG Second Chances";
+    src: url("../fonts/KGSecondChancesSolid.ttf");
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+.container {
+    background-color: #efefef;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.visual-wrapper, .form-wrapper {
+    height: 100%;
+}
+
+.visual-wrapper {
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    -webkit-box-shadow: inset 50px 0px 45px -40px rgba(0,0,0,0.29);
+    -moz-box-shadow: inset 50px 0px 45px -40px rgba(0,0,0,0.29);
+    box-shadow: inset 50px 0px 45px -40px rgba(0,0,0,0.29);
+}
+
+.form-wrapper {
+    position: relative;
+    background-color: white;
+    width: 24vw;
+    padding: 0.8vw;
+    overflow: scroll;
+}
+
+.wrap {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.form-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+.form-wrapper h1 {
+    text-align: center;
+    margin-bottom: 1vw;
+    font-size: 2.4vw;
+    font-family: 'KG Second Chances', cursive;
+    color: #353754;
+}
+
+.reminder {
+    font-family: 'KG Second Chances', sans-serif;
+    color: #606D71;
+    font-size: 0.7vw;
+}
+
+.reminder a {
+    color: #CF2F3F;
+}
+
+.reminder a:hover {
+    border-bottom: 2px solid #CF2F3F;
+}
+
+form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+form div {
+    position: relative;
+}
+
+form div ul li, .alert {
+    font-size: 0.6vw;
+    font-family: 'KG Second Chances', sans-serif;
+    color: #CF2F3F;
+}
+
+form input, button {
+    font-size: 0.8vw;
+    padding: 0.6vw;
+    font-family: 'KG Second Chances', cursive;
+    border: none;
+}
+
+form input {
+    width: 100%;
+    color: #353754;
+    margin-bottom: 0.4vw;
+    outline: none;
+    border: 1px solid #dad8d8;
+    background-color: #ececec;
+}
+
+form input::placeholder {
+    opacity: 0.5; /* Firefox */
+}
+
+form button {
+    background-color: #F7AF42;
+    margin-bottom: 10px;
+    outline: none;
+    color: #FFFFFF;
+}

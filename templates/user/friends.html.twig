@@ -1,0 +1,114 @@
+{% extends 'user/base.html.twig' %}
+
+{% block title %}Amis{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/user/base.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/user/friends.css') }}">
+{% endblock %}
+
+{% block js_src %}
+{% endblock %}
+
+{% block body %}
+
+    <div class="square-1 list friends">
+        <div class="list-title">Amis</div>
+        <ul>
+            {% if friends is not null %}
+                {% for friend in friends %}
+                    <li>
+                        <div class="user-username">{{ friend.username }}
+                            {% if friend.lastConnected is not empty %}
+                                <small class="last-connected">{{ friend.lastConnected }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="action">
+                            <a href="{{ path('user_messages', {'id': friend.id}) }}"><i class="fas fa-envelope"></i></a>
+                            <a href="{{ path('user_friend_delete', {'id': friend.id}) }}"><i class="fas fa-user-minus"></i></a>
+                        </div>
+                    </li>
+                {% endfor %}
+            {% endif %}
+        </ul>
+    </div>
+    <div class="square-1 other-1">
+        <div class="square-2 other-2">
+
+            <div class="square-3 list friend-requests-received">
+                <div class="list-title">Demandes d'ami reçues</div>
+                <ul>
+                    {% if friendRequestsReceived is not null %}
+                        {% for friendRequestReceived in friendRequestsReceived %}
+                            <li>
+                                <div class="user-username">{{ friendRequestReceived.username }}</div>
+                                <div class="action">
+                                    <a href="{{ path('user_friend_request_accept', {'id': friendRequestReceived.id}) }}"><i class="fas fa-check"></i></a>
+                                    <a href="{{ path('user_friend_request_deny', {'id': friendRequestReceived.id}) }}"><i class="fas fa-times"></i></a>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </div>
+
+            <div class="square-3 list friend-requests-sent">
+                <div class="list-title">Demandes d'ami envoyées</div>
+                <ul>
+                    {% if friendRequestsSent is not null %}
+                        {% for friendRequestSent in friendRequestsSent %}
+                            <li>
+                                <div class="user-username">{{ friendRequestSent.username }}</div>
+                                <div class="action">
+                                    <a href="{{ path('user_friend_request_delete', {'id': friendRequestSent.id}) }}"><i class="fas fa-times"></i></a>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </div>
+
+        </div>
+        <div class="square-2 other-2">
+
+            <div class="square-3 list suggestions">
+                <div class="list-title">Suggestions</div>
+                <ul>
+                    {% if suggestions is not null %}
+                        {% for suggestion in suggestions %}
+                            <li>
+                                <div class="user-username">{{ suggestion.username }}</div>
+                                <div class="action">
+                                    <a href="{{ path('user_friend_request_add', {'id': suggestion.id}) }}"><i class="fas fa-user-plus"></i></a>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </div>
+
+            <div class="square-3 list friend-search">
+                <div class="list-title">Rechercher un joueur</div>
+                {{ form_start(form) }}
+                {{ form_row(form.user, {'label': false, 'value': false, 'attr': {'placeholder': "Rentrez un pseudo"}}) }}
+                <input type="submit">
+                {{ form_end(form) }}
+                <ul>
+                    {% if searchUser is not null %}
+                        <li>
+                            <div class="user-username">{{ searchUser.username }}</div>
+                            <div class="action">
+                                <a href="{{ path('user_friend_request_add', {'id': searchUser.id}) }}"><i class="fas fa-user-plus"></i></a>
+                            </div>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js_end %}
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}
+    - {{ user.username }}
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/admin/table.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/admin/users.css') }}">
+{% endblock %}
+{% block js_src %}
+{% endblock %}
+
+{% block body %}
+    <img src="{{ user.picture }}" alt="">
+    <h1>{{ user.username }} ({{ user.rank }}%)</h1>
+    <strong>Adresse mail: {{ user.email }}</strong><br/><br/>
+    <p>Parties jouées: {{ user.games }}</p><br/>
+    <p>Parties gagnées: {{ user.wins }}</p><br/>
+    Amis:
+    <ul>
+        {% if user.friends is not null %}
+            {% for friend in user.friends %}
+                <li>- <a href="{{ path('admin_user_profile', {'id': friend.id}) }}">{{ friend.username }}</a></li>
+            {% endfor %}
+        {% endif %}
+    </ul><br/>
+    Demandes d'ami:
+    <ul>
+        {% if user.friendRequests is not null %}
+            {% for friendRequest in user.friendRequests %}
+                <li>- <a href="{{ path('admin_user_profile', {'id': friendRequest.id}) }}">{{ friendRequest.username }}</a></li>
+            {% endfor %}
+        {% endif %}
+    </ul>
+{% endblock %}
+
+{% block js_end %}
+{% endblock %}

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>A&M - {% block title %}{% endblock %}</title>
+
+    <link rel="stylesheet" href="{{ asset('assets/css/base.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/user/base.css') }}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    {% block stylesheets %}{% endblock %}
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    {% block js_src %}{% endblock %}
+
+</head>
+<div class="loader">
+    <img src="{{ asset('assets/img/logo/game/logo.svg') }}" alt="">
+</div>
+<body>
+<script>
+</script>
+<div class="container">
+
+    <div class="content-wrapper">
+
+        {% include 'user/header.html.twig' %}
+
+        <div class="content">
+            {% block body %}{% endblock %}
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    $(window).on("load",function(){
+        setTimeout(function () {
+            jQuery(".loader").fadeOut("200");
+        }, 750);
+    });
+
+    $( document ).ready(function() {
+        $('.square-1').height($(".square-1").width());
+        $( window ).resize(function() {
+            $('.square-1').height($(".square-1").width());
+        });
+    });
+
+</script>
+{% block js_end %}
+
+{% endblock %}
+</body>
+</html>

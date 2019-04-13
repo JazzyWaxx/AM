@@ -1,0 +1,47 @@
+{% extends 'user/base.html.twig' %}
+
+{% block title %}Tableau de board{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/user/base.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/user/dashboard.css') }}">
+{% endblock %}
+
+{% block js_src %}
+{% endblock %}
+
+{% block body %}
+
+    <div class="square-1 play" style="background-image: url({{ asset('assets/img/user/dashboard/play.png') }});">
+        <div class="square-wrapper">
+            <a href="{{ path('user_play') }}">Jouer</a>
+        </div>
+    </div>
+
+    <div class="square-1 other-1">
+
+        <div class="square-2 other-2">
+            <div class="square-3 friends" style="background-image: url({{ asset('assets/img/user/dashboard/friends.png') }});">
+                <div class="square-wrapper">
+                    <a href="{{ path('user_friends') }}">Amis</a>
+                </div>
+            </div>
+            <div class="square-3 messages" style="background-image: url({{ asset('assets/img/user/dashboard/messages.png') }});">
+                <div class="square-wrapper">
+                    <a href="{{ path('user_messages') }}">Messages</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="square-2 notifications" style="background-image: url({{ asset('assets/img/user/dashboard/notifications.png') }});">
+            <div class="square-wrapper">
+                <a href="{{ path('user_notifications') }}">Notifications</a>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block js_end %}
+{% endblock %}

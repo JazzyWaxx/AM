@@ -1,0 +1,15 @@
+<header>
+    <nav>
+        <ul class="menu">
+            <li><a href="{{ path('user_dashboard') }}"><i class="fas fa-columns"></i> Tableau de bord</a></li>
+            <li><a href="{{ path('user_leaderboard') }}"><i class="fas fa-list-ol"></i> Classement</a></li>
+            <li><a href="{{ path('user_pofile') }}"><i class="fas fa-user"></i> Mon profil</a></li>
+            {#<li><a href=""><i class="fas fa-envelope"></i> Messages</a></li>
+            <li><a href=""><i class="fas fa-bell"></i> Notifications</a></li>#}
+        </ul>
+        <ul class="logged-user-info">
+            <li class="logged-user-username">{{ app.user.username }} <span class="logged-user-wins"><i class="fas fa-medal"></i>{{ app.user.getWinnerGames | length }}</span></li>
+            <li class="logged-user-logout"><a href="{{ path('security_logout') }}"><i class="fas fa-sign-out-alt"></i></a></li>
+        </ul>
+    </nav>
+</header>

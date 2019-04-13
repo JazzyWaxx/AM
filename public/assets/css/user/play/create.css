@@ -1,0 +1,28 @@
+.random .square-wrapper {
+    background-color: rgba(247, 175, 66, 1);
+}
+
+/*.create .square-wrapper:hover {
+    background-color: rgba(247, 175, 66, 0.3);
+}*/
+
+.join .square-wrapper {
+    background-color: rgba(247, 175, 66, 1);
+}
+
+/*
+.join .square-wrapper:hover {
+    background-color: rgba(247, 175, 66, 0.3);
+}*/
+
+.list {
+    background-color: #f7c342;
+}
+
+.list-title {
+    background-color: #F7AF42;
+}
+
+.list ul li {
+    color: #353754;
+}

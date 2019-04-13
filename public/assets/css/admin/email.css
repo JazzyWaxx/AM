@@ -1,0 +1,40 @@
+.form-wrapper {
+    padding: 10px;
+    background-color: white;
+    width: 500px;
+}
+
+.form-wrapper * {
+    font-family: "Viga", cursive;
+    margin: 0;
+}
+
+h1 {
+    font-size: 1vw;
+    color: #504D6C;
+    margin-bottom: 10px;
+}
+
+form input, form textarea, button {
+    margin-bottom: 10px;
+    padding: 0.4vw;
+    background-color: #efefef;
+    border: none;
+    width: 100%;
+    font-size: 0.8vw;
+    color: #504D6C;
+    outline: none;
+}
+
+form input {
+    border-bottom: 1px solid #504D6C;
+}
+
+form textarea {
+    margin-bottom: 2px;
+}
+
+button {
+    color: white;
+    background-color: #504D6C;
+}

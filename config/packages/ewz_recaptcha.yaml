@@ -1,0 +1,8 @@
+ewz_recaptcha:
+  public_key: '6Lfu_5gUAAAAADPawEcRsGTS3Gb6XfqSMcfYIMRj'
+  private_key: '6Lfu_5gUAAAAAP3fOd_xEfFhyDmMhS7bMiM410q_'
+  locale_key:  '%kernel.default_locale%'
+  locale_from_request: true
+  # ajax: true
+  # enabled: false
+  # verify_host: true

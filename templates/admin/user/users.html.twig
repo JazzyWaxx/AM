@@ -1,0 +1,215 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}
+    - Utilisateurs
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/admin/table.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/admin/users.css') }}">
+{% endblock %}
+{% block js_src %}
+{% endblock %}
+
+{% block body %}
+    <div class="content-filter">
+        <form action="">
+            <input type="text" placeholder="Rechercher dans les utilisateurs">
+            <select>
+                <option>Par date d'inscription (Ne marche pas encore)</option>
+            </select>
+        </form>
+    </div>
+    <div class="content-list">
+        <table>
+            <thead>
+                <tr>
+                    <td>Nom d'utilisateur</td>
+                    <td>Adresse email</td>
+                    <td>Date d'inscription</td>
+                    <td>Nombre de parties</td>
+                    <td>Rank</td>
+                    <td>Status</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% if users is not empty %}
+                    {% for user in users %}
+                        <tr data-id="{{ user.id }}">
+                            <td class="user-username">
+                                <img src="{{ user.picture }}" alt="">
+                                <strong>
+                                    <a href="{{ path('admin_user_profile', {'id': user.id}) }}">{{ user.username }}</a>
+                                </strong>
+                                <ul class="action">
+                                    <li>
+                                        <a href="{{ path('admin_email_user', {'id': user.id}) }}">
+                                            Envoyer un mail
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ path('admin_user_edit',{'id': user.id}) }}">
+                                            Modifier
+                                        </a>
+                                    </li>
+                                    <li>
+                                        {% if user.status == 3 %}
+                                            <a data-action="activate" class="user-action-deactivate" href="{{ path('admin_user_status', {'id': user.id, 'status': 0}) }}">Activer</a>
+                                        {% else %}
+                                            <a data-action="deactivate" class="user-action-deactivate" href="{{ path('admin_user_status', {'id': user.id, 'status': 3}) }}">Désactiver</a>
+                                        {% endif %}
+
+                                    </li>
+                                    <li>
+                                        {% if user.status == 2 %}
+                                            <a data-action="unban" class="user-action-ban" href="{{ path('admin_user_status', {'id': user.id, 'status': 0}) }}">Gracier</a>
+                                        {% else %}
+                                            <a data-action="ban" class="user-action-ban" href="{{ path('admin_user_status', {'id': user.id, 'status': 2}) }}">Bannir</a>
+                                        {% endif %}
+                                    </li>
+                                    <li>
+                                        <a data-action="warn" class="user-action-warn" href="{{ path('admin_user_warn', {'id': user.id}) }}">Avertir</a>
+                                    </li>
+                                </ul>
+                            </td>
+                            <td class="user-email"><a href="{{ path('admin_email_user', {'id': user.id}) }}">{{ user.email }}</a></td>
+                            <td class="user-created-at">{{ user.createdAt | date("d/m/Y") }}</td>
+                            <td class="user-games">{{ user.games }}</td>
+                            <td class="user-rank">{{ user.rank }}% ({{ user.wins }} wins)</td>
+                            <td class="user-status">
+                                {% if user.status == 0 %}
+                                    <span class="user-status-disconnected">Déconnecté</span>
+                                {% elseif user.status == 1 %}
+                                    <span class="user-status-connected">Connecté</span>
+                                {% elseif user.status == 2 %}
+                                    <span class="user-status-banned">Banni</span>
+                                {% elseif user.status == 3 %}
+                                    <span class="user-status-deactivated">Désactivé</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td>Aucun utilisateur</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                {% endif %}
+            </tbody>
+                    <tfoot>
+                    <tr>
+                        <td>Nom d'utilisateur</td>
+                        <td>Adresse email</td>
+                        <td>Date d'inscription</td>
+                        <td>Nombre de parties</td>
+                        <td>Rank</td>
+                        <td>Status</td>
+                    </tr>
+                    </tfoot>
+
+
+
+        </table>
+    </div>
+    {% include 'pagination.html.twig' %}
+{% endblock %}
+
+{% block js_end %}
+    <script>
+
+        $(".user-action-deactivate, .user-action-ban").click(function(event) {
+            event.preventDefault();
+
+            var action = $(this).attr("data-action");
+            var confirmMsg = "Etes-vous sûr de ";
+            if (action == "deactivate") {
+                confirmMsg += "désactiver";
+            } else if (action == "activate") {
+                confirmMsg += "réactiver";
+            } else if (action == "ban") {
+                confirmMsg += "bannir";
+            } else if (action == "unban") {
+                confirmMsg += "gracier";
+            }
+            confirmMsg += " ce joueur? Un mail lui sera envoyé.";
+
+            var answer = confirm(confirmMsg);
+            if (answer) {
+                var url = this.href;
+                changeUserStatus($(this),url);
+            };
+        });
+
+        async function changeUserStatus(link,url) {
+
+            var userElement = link.closest("tr");
+            var userId = userElement.attr("data-id");
+            let resultDelete = await axios.get(url);
+            resultDelete = resultDelete.data;
+
+            var newStatus = "";
+            var userActionBan = userElement.find(".user-action-ban");
+            var userActionDeactivate = userElement.find('.user-action-deactivate');
+            var userStatus = userElement.find('.user-status');
+
+            if (resultDelete.status == 2) { /*banni*/
+
+                banText = "Gracier";
+                banUrl = "user/"+userId+"/status/0";
+                deactivateText = "Désactiver";
+                deactivateUrl = "user/"+userId+"/status/3";
+                newStatus = '<span class="user-status-banned">Banni</span>';
+
+            } else if (resultDelete.status == 3) { /*désactivé*/
+
+                banText = "Bannir";
+                banUrl = "user/"+userId+"/status/2";
+                deactivateText = "Activer";
+                deactivateUrl = "user/"+userId+"/status/0";
+                newStatus = '<span class="user-status-deactivated">Désactivé</span>';
+
+            } else {
+
+                banText = "Bannir";
+                banUrl = "user/"+userId+"/status/2";
+                deactivateText = "Désactiver";
+                deactivateUrl = "user/"+userId+"/status/3";
+                newStatus = '<span class="user-status-disconnected">Déconnecté</span>';
+
+            }
+
+            userActionBan.text(banText);
+            userActionBan.attr('href', banUrl);
+            userActionDeactivate.text(deactivateText);
+            userActionDeactivate.attr('href', deactivateUrl);
+            userStatus.html(newStatus);
+        };
+
+        $(".user-action-warn").click(function(event) {
+            event.preventDefault();
+            var action = $(this).attr("data-action");
+            confirmMsg = "Etes-vous sûr d'avertir ce joueur? Un mail lui sera envoyé.";
+            var answer = confirm(confirmMsg);
+            if (answer) {
+                var url = this.href;
+                warnUser($(this),url);
+            };
+        });
+
+        async function warnUser(link,url) {
+
+            var userElement = link.closest("tr");
+            var userId = userElement.attr("data-id");
+            let resultDelete = await axios.get(url);
+            resultDelete = resultDelete.data;
+            if (resultDelete.code == 200) {
+                link.text('Joueur averti');
+            }
+        };
+
+    </script>
+{% endblock %}

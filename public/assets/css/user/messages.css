@@ -1,0 +1,107 @@
+.list {
+    background-color: #728287;
+}
+
+.list-title {
+    background-color: #606D71;
+}
+
+.list ul li {
+    color: #606D71;
+    padding: 0;
+}
+
+.list ul li a {
+    width: 100%;
+    padding: 0.8vw;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.messages ul li a .friend-username {
+    font-size: 1vw;
+}
+
+.messages ul li a .preview {
+    display: flex;
+    font-size: 0.8vw;
+    color: #728287;
+}
+
+.messages ul li a .last-date {
+    display: flex;
+    font-size: 1vw;
+}
+
+.action a:not(:last-child) {
+    margin-right: 0.5vw;
+}
+
+.conversation ul {
+    display: inline-block;
+}
+
+.conversation ul li {
+    display: flex;
+    flex-direction: column;
+    background-color: transparent;
+    border: none;
+}
+
+.conversation ul li p {
+    padding: 0.4vw;
+    background-color: white;
+    font-size: 1vw;
+}
+
+.conversation ul li .username {
+    padding: 0 0.1vw;
+    font-size: 0.8vw;
+    color: white;
+}
+
+.conversation ul li .date {
+    color: #d2d7d9;
+    font-size: 0.7vw;
+    padding: 0.1vw 0.1vw;
+}
+
+.conversation ul .friend-msg {
+    align-items: flex-start;
+    padding-top: 0.5vw;
+    padding-bottom: 0.5vw;
+    padding-left: 0.5vw;
+    padding-right: 10vw;
+}
+
+.conversation ul .my-msg {
+    align-items: flex-end;
+    padding-top: 0.5vw;
+    padding-bottom: 0.5vw;
+    padding-right: 0.5vw;
+    padding-left: 10vw;
+}
+
+.conversation form {
+    width: 100%;
+}
+
+.conversation form input {
+    font-family: "Viga", cursive;
+    color: #606D71;
+}
+
+
+.conversation input[type=text] {
+    width: 100%;
+    padding: 0.8vw;
+    font-size: 1vw;
+    border: none;
+    outline: none;
+}
+
+.conversation input[type=submit] {
+    display: none;
+}

@@ -1,0 +1,108 @@
+@font-face {
+    font-family: "KG Second Chances";
+    src: url("../fonts/KGSecondChancesSolid.ttf");
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+header {
+    height: 80%;
+    width: 100%;
+    position: relative;
+}
+
+.background-container {
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    overflow: hidden;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    -webkit-box-shadow: inset 0px -58px 77px -52px rgba(0,0,0,0.52);
+    -moz-box-shadow: inset 0px -58px 77px -52px rgba(0,0,0,0.52);
+    box-shadow: inset 0px -58px 77px -52px rgba(0,0,0,0.52);
+}
+
+.header-background {
+    width: 100%;
+    overflow: hidden;
+    filter: blur(2px);
+}
+
+.logo-container {
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-game {
+    width: 800px;
+    animation-duration: 0.8s;
+    animation-name: logoanimation;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    -webkit-filter: drop-shadow( 0px 0px 65px rgba(0, 0, 0, 0.80));
+    filter: drop-shadow( 0px 0px 65px rgba(0, 0, 0, 0.80));
+}
+
+@keyframes logoanimation {
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.05);
+    }
+}
+
+.access-game {
+    width: 100%;
+    height: 20%;
+    background-color: #212121;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.access-game a {
+    font-size: 30px;
+    font-family: 'KG Second Chances', cursive;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    text-decoration: none;
+    color: white;
+    padding: 20px;
+    transition: all 0.1s ease-in-out ;
+}
+
+.a-login {
+    background-color: #504D6C;
+    border-bottom: 0.2vw solid #3b3950;
+}
+
+.a-signup {
+    background-color: #537D39;
+    border-bottom: 0.2vw solid #3f5e2b;
+}
+
+.access-game a:active {
+    background-color: #F7AF42;
+}
+
+.access-game a:hover {
+    border-bottom: 0 solid #3b3950;
+}
+
+.access-game a:not(:last-child) {
+    margin-right: 20px;
+}

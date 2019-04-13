@@ -1,0 +1,83 @@
+{% extends 'user/base.html.twig' %}
+
+{% block title %}Amis{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/user/base.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/user/messages.css') }}">
+{% endblock %}
+
+{% block js_src %}
+{% endblock %}
+
+{% block body %}
+
+    <div class="square-1 list messages">
+        <div class="list-title">Messages</div>
+        <ul>
+            {% if allMessages is not empty %}
+                {% for message in allMessages %}
+                    <li>
+                        <a href="{{ path('user_messages', {'id': message.id}) }}">
+                            <p>
+                                <span class="friend-username">{{ message.username }}</span><br/>
+                                {% if message.preview %}
+                                    <small class="preview">
+                                        {% if message.preview.id == app.user.id %}
+                                            Vous:
+                                        {% endif %}
+                                        {{ message.preview.message }}
+                                    </small>
+                                {% endif %}
+                            </p>
+                            <span class="last-date">{{ message.endedAt | date("d/m/Y") }}</span>
+                        </a>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <li><a href="#">Aucun message pour l'instant</a></li>
+            {% endif %}
+
+        </ul>
+    </div>
+    <div class="square-1 list conversation">
+        {% if conversationInfo is not empty %}
+            <div class="list-title">
+                {{ conversationInfo.username }}
+                <div>
+                    <a href="{{ path('user_message_delete', {'id': conversationInfo.id}) }}"><i class="fas fa-trash"></i></a>
+                </div>
+            </div>
+            <ul>
+                {% if conversationInfo.messages is not empty %}
+                    {% for message in conversationInfo.messages %}
+                        <li class="{% if message.id == app.user.id %}my-msg{% else %}friend-msg{% endif %}">
+                            <span class="username">{% if message.id == app.user.id %}Moi{% else %}{{ message.username }}{% endif %}</span>
+                            <p>{{ message.message }}</p>
+                            <span class="date">{{ message.createdAt.date | date("d M G:i") }}</span>
+                        </li>
+                    {% endfor %}
+                {% endif %}
+            </ul>
+
+            {{ form_start(form) }}
+            {{ form_row(form.message, {'label': false, 'value': false, 'attr': {'placeholder': "Envoyer un message"}}) }}
+            <input type="submit">
+            {{ form_end(form) }}
+        {% endif %}
+
+    </div>
+{% endblock %}
+
+{% block js_end %}
+    <script>
+
+        var $chat = $(".conversation ul");
+        var convHeight = 0;
+        $(".conversation ul li").each(function () {
+            convHeight += $(this).height();
+        });
+        $chat.scrollTop(convHeight);
+
+    </script>
+{% endblock %}

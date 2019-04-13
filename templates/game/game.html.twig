@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/game/game.css') }}">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
+    <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
+</head>
+<body>
+<div id="container" style="background-image: url({{ asset('assets/img/game/plateau/background.svg') }})">
+    {% verbatim %}
+    <div class="turn-info">
+        <p v-if="turn == me['id']">A vous de jouer!</p>
+        <p v-else>Votre adversaire joue</p>
+    </div>
+    {% endverbatim %}
+
+    <div class="sidebar s-left">
+
+        <div id="dices" style="background-image: url({{ asset('assets/img/game/plateau/dicesfield.svg') }})">
+        {% verbatim %}
+
+            <ul class="dice">
+                <li v-for="dice in dices['all']" v-on:click="selectDice(dice['type'])" v-bind:class="'dice'+dice['type']" >
+                    <div v-if="dice['status'] ==  0">{{ dice['value'] }}</div>
+                    <div v-else class="played">{{ dice['value'] }}</div>
+                </li>
+            </ul>
+            <button v-if="dices['played'] > 0 && turn == me['id']" v-on:click="nextTurn">Je passe mon tour</button>
+        </div>
+        {% endverbatim %}
+    </div>
+
+
+    <div id="game-wrap">
+        <div id="game">
+            {% verbatim %}
+                <ul class="player-area" id="playerB">
+                    <li
+                    v-for="card in opponent['field']"
+                    v-bind:data-id="card.id"
+                    v-bind:style="{gridColumn: card.column, gridRow: card.row, backgroundImage: 'url(' + card.picture + ')', transform: 'rotate(180deg) translateY(calc((' + card.row + ' - 1) * 4vw))', zIndex: (11 - card.row)}"
+                    v-bind:class="'row'+card.row"
+                    v-on:click="moveCard(card.id)"
+                    >
+
+                    </li>
+                </ul>
+            {% endverbatim %}
+
+            <ul id="gamePath">
+                <li class="game-field" style="background-image: url({{ asset('assets/img/game/plateau/plateau.jpg') }})"></li>
+            </ul>
+
+            {% verbatim %}
+                <ul class="player-area" id="playerA">
+                    <li
+                    v-for="card in me['field']"
+                    v-bind:id="card.id"
+                    v-bind:style="{gridColumn: card.column, gridRow: card.row, backgroundImage: 'url(' + card.picture + ')', transform: 'translateY(calc((' + card.row + ' - 1) * -4vw))', zIndex: card.row}"
+                    v-bind:class="[card.class]"
+                    v-bind:data-type="card.type"
+                    v-on:click="moveCard(card.id)"
+                    >
+                    <div class="card-filter"></div>
+                    </li>
+                </ul>
+            {% endverbatim %}
+        </div>
+    </div>
+
+    <div class="sidebar s-right">
+        <div></div>
+        <div id="chat" style="background-image: url({{ asset('assets/img/game/plateau/chat.svg') }})">
+            {% verbatim %}
+            <ul class="messages" >
+                <li v-for="m in game['messages']" >
+                    <div v-if="m.id == me['id']" class="m-me">
+                        <span>{{ m.message }}</span>
+                    </div>
+                    <div v-else class="m-opponent">
+                        <span>{{ m.message }}</span>
+                    </div>
+                </li>
+            </ul>
+            <form v-on:submit.prevent class="chat-form">
+                <input v-model="game['message']" type="text" placeholder="Ecrire...">
+                <button v-on:click="sendMessage" type="submit"><i class="fas fa-paper-plane"></i></button>
+            </form>
+            {% endverbatim %}
+        </div>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+
+        var AMgame = new Vue({
+            el: '#container',
+            data: {
+                game: {
+                    id: null,
+                    messages: [],
+                    message: ""
+                },
+                me: {
+                    id: null,
+                    field: null
+                },
+                opponent: {
+                    id: null,
+                    field: null
+                },
+                dices: {
+                    all: [],
+                    played: 0,
+                    selected: null
+                },
+                turn: null,
+                fight: false,
+                loading: false,
+            },
+            methods: {
+                async gameData(array) {
+                    let result = await axios.get(Routing.generate('game_data', {game: '{{ gameId }}'}));
+                    result = result.data;
+                    $.each(array, function (i, data) {
+                        if (data === "game") {
+
+                            AMgame.game['id'] = result.gameId;
+
+                        } else if (data === "me") {
+
+                            AMgame.me['id'] = result.myId;
+                            AMgame.me['field'] = result.myField;
+                            $.each(AMgame.me['field'], function (index, card) {
+                                card['class'] = "normal";
+                            });
+
+                        } else if (data === "opponent") {
+
+                            AMgame.opponent['id'] = result.opponentId;
+                            AMgame.opponent['field'] = result.opponentField;
+
+                        } else if (data === "dices") {
+
+                            AMgame.dices['all'] = result.dices["dices"];
+                            var playedDices = 0;
+                            $.each(AMgame.dices["all"], function (i, dice) {
+                                if (dice['status'] == 1) {
+                                    playedDices++;
+                                }
+                            });
+                            AMgame.dices['played'] = playedDices;
+
+                        } else if (data === "turn") {
+
+                            AMgame.turn = result.dices["turn"];
+
+                        } else if (data === "chat") {
+
+                            AMgame.game['messages'] = result.chat;
+                            AMgame.scrollMessages();
+
+                        } else if (data === "*") {
+
+                            AMgame.game['id'] = result.gameId;
+                            AMgame.me["id"] = result.myId;
+                            AMgame.me["field"] = result.myField;
+                            $.each(AMgame.me['field'], function (index, card) {
+                                card['class'] = "normal";
+                            });
+                            AMgame.opponent['id'] = result.opponentId;
+                            AMgame.opponent['field'] = result.opponentField;
+                            AMgame.dices["all"] = result.dices["dices"];
+                            var playedDices = 0;
+                            $.each(AMgame.dices["all"], function (i, dice) {
+                                if (dice['status'] == 1) {
+                                    playedDices++;
+                                }
+                            });
+                            AMgame.dices['played'] = playedDices;
+                            AMgame.turn = result.dices["turn"];
+                            AMgame.game['messages'] = result.chat;
+                            AMgame.scrollMessages();
+
+                        }
+                    })
+                }, // array = ["game", "dices", "opponent", ...] -> update la vue
+                async changeDiceStatus(type) {
+                    let result = await axios.get(Routing.generate('game_change_dice_status', {game: this.game['id'], type: type}));
+                    result = result.data;
+                    if (result.code === 200) {
+                        return true;
+                    }
+                },
+                async moveCard(id, value = null, user = this.me['id'], dice = true) {
+                    if (!this.loading) {
+
+                        this.loading = true;
+                        var card = this.me['field'].find(c => c.id === id);
+
+                        if (dice) { // si mouvement avec dé
+
+                            let columnCard = this.sortByKeyAsc($.grep(this.me['field'], function (c) {
+                                return c['column'] === card['column'];
+                            }), 'row');
+
+                            let selectedDice = this.dices['selected'];
+                            let moveValue = selectedDice['value'];
+
+                            if (selectedDice.length !== 0 && this.turn == this.me['id'] && (columnCard.length - card['row'] < 3) && (card['type'] == selectedDice['type'] || card['type'] == 4)) {
+                                console.log("test");
+                                this.preMoveCard(id, selectedDice['value']);
+                                this.preChangeDiceStatus(selectedDice['type']);
+
+                                let result = await axios.get(Routing.generate('game_move_card', {game: this.game['id'], user: user, card: id, value: moveValue}));
+                                result = result.data;
+                                if (result.code === 200) {
+                                    if (this.changeDiceStatus(selectedDice['type'])) {
+                                        this.deselectDice();
+                                        this.loading = false;
+                                        this.checkFight();
+                                    }
+                                } else {
+                                    this.dices['selected'] = selectedDice;
+                                }
+                                this.gameData(["*"]);
+                            }
+                        } else { // si mouvement (arrière) de combat ex: this.moveCard(12, -1, false);
+                            if (value !== null) {
+                                let result = await axios.get(Routing.generate('game_move_card', {game: this.game['id'], user: user, card: id, value: value}));
+                                result = result.data;
+                                if (result.code === 200) {
+                                    console.log("Carte bougée en arrière");
+                                    this.loading = false;
+                                } else {
+                                    console.log("Carte pas bougée en arrière");
+                                }
+                            }
+                        }
+
+                    }
+
+
+                },
+                async nextTurn() {
+                    this.deselectDice();
+                    this.turn = this.opponent['id'];
+                    let result = await axios.get(Routing.generate('game_next_turn', {game: this.game['id']}));
+                    result = result.data;
+                    if (result.code == 200) {
+                        this.gameData(["dices", "turn", "opponent"]);
+                    }
+                },
+                async checkFight() {
+                    if (!this.loading) {
+                        for (i = 1; i <= 11; i++) {
+                            var myColumn = this.sortByKeyAsc($.grep(this.me['field'], function (card) {
+                                return card['column'] == i;
+                            }), 'row');
+                            var opponentColumn = this.sortByKeyAsc($.grep(this.opponent['field'], function (card) {
+                                return card['column'] == 12-i;
+                            }), 'row');
+
+                            if (myColumn.length !== 0 && opponentColumn.length !== 0) {
+
+                                console.log("Combat à la colonne "+i);
+                                myCard = myColumn[myColumn.length - 1];
+                                opponentCard = opponentColumn[opponentColumn.length - 1];
+                                console.log(myCard);
+                                console.log(opponentCard);
+                                let typeDiff = myCard['type'] - opponentCard['type'];
+                                let powerDiff = myCard['strengh'] - opponentCard['strengh'];
+                                console.log("Différence de type: "+typeDiff);
+                                console.log("Différence de force: "+powerDiff);
+                                var looser = null;
+
+                                if (typeDiff === 0) { // same card type
+
+                                    if (powerDiff === 0) { // égualité
+
+                                        console.log("égalité");
+                                        this.moveCard(myCard['id'], -1, this.me['id'], false).then(this.moveCard(opponentCard['id'], -1, this.opponent['id'], false));
+
+                                        this.gameData(["me", "opponent"]);
+                                        this.checkFight();
+
+                                    } else if (powerDiff === -1 || powerDiff === -2) { // adversaire gagne
+
+                                        console.log("adversaire gagne");
+                                        looser = this.me['id'];
+
+                                    } else if (powerDiff === 1 || powerDiff === 2) { // je gagne
+
+                                        console.log("je gagne");
+                                        looser = this.opponent['id'];
+
+                                    }
+
+                                } else if (typeDiff === -1 || typeDiff === -2) {
+
+                                    if (myCard['type'] === 1 && opponentCard['type'] === 3) { // je gagne
+
+                                        console.log("je gagne");
+                                        looser = this.opponent['id'];
+
+                                    } else { // adversaire gagne
+
+                                        console.log("adversaire gagne");
+                                        looser = this.me['id'];
+
+                                    }
+
+                                } else if (typeDiff === 1 || typeDiff === 2) {
+
+                                    if (myCard['type'] === 3 && opponentCard['type'] === 1) { // adversaire gagne
+
+                                        console.log("adversaire gagne");
+                                        looser = this.me['id'];
+
+                                    } else { // je gagne
+
+                                        console.log("je gagne");
+                                        looser = this.opponent['id'];
+
+                                    }
+
+                                }
+
+                                if (looser == this.me['id']) {
+                                    console.log(this.me['id']);
+                                    result = await axios.get(Routing.generate('game_card_delete', {game: this.game['id'], userid: this.me['id'], cardid: myCard['id']}));
+                                    result = result.data;
+                                    console.log(result);
+                                    if (result.code == 200) {
+                                        console.log("carte supprimée");
+                                        this.gameData(["me", "opponent"]);
+                                        this.checkFight();
+                                    }
+                                } else if (looser == this.opponent['id']) {
+                                    console.log(this.opponent['id']);
+                                    var result = await axios.get(Routing.generate('game_card_delete', {game: this.game['id'], userid: this.opponent['id'], cardid: opponentCard['id']}));
+                                    result = result.data;
+                                    console.log(result);
+                                    if (result.code == 200) {
+                                        console.log("carte supprimée");
+                                        this.gameData(["me", "opponent"]);
+                                        this.checkFight();
+                                    }
+                                }
+
+
+                            }
+                        }
+                    }
+                },
+                async sendMessage() {
+                    let message = {
+                        id: this.me['id'],
+                        message: this.game['message'],
+                        date: new Date()
+                    };
+
+                    if (this.game['message'] !== "") {
+                        this.preSendMessage(message);
+                        this.game['message'] = "";
+                        /*AMgame.game['messages'].push(message);
+                        console.log(this.game['messages']);
+                        this.$forceUpdate();*/
+                        let result = await axios.get(Routing.generate('game_message_send', {game: this.game['id'], json: JSON.stringify(message)}));
+                        result = result.data;
+                    }
+
+                },
+                preSendMessage(message) {
+                    this.game['messages'].push(message);
+                    this.$forceUpdate();
+                },
+
+                preMoveCard(id, value) {
+
+                    let selectedCard = this.me['field'].find(c => c.id === id);
+
+                    let currentRow = selectedCard['row'];
+                    let currentColumn = selectedCard['column'];
+
+                    let cardsToMove = this.sortByKeyAsc(this.me['field'].filter(function (obj) {
+                        return obj.column === currentColumn && obj.row >= currentRow;
+                    }), 'row');
+
+                    if (cardsToMove.length <= 3) {
+
+                        let nextColumn = selectedCard['column'] + value;
+                        if (nextColumn > 11) { nextColumn = 11; }
+
+                        let cardsOnNextColumn = this.sortByKeyAsc($.grep(this.me['field'], function (card) {
+                            return card['column'] === nextColumn;
+                        }), 'row');
+                        let firstRowOfNextColumn = cardsOnNextColumn.length + 1;
+
+                        $.each(cardsToMove, function (index, card) {
+                            card['column'] = nextColumn;
+                            card['row'] = card['row'] - currentRow + firstRowOfNextColumn;
+                        });
+
+                    }
+
+
+                },
+                preChangeDiceStatus(type) {
+                    let dice = this.dices['all'].find(d => d.type === type);
+                    dice['status'] = 1;
+                    this.dices['selected'] = null;
+                },
+
+                changeCardClass(id, classname) {
+                    if (id === "*") {
+                        $.each(this.me['field'], function (index, card) {
+                            card['class'] = classname;
+                        });
+                    } else {
+                        card = this.me['field'].find(c => c.id === id);
+                        card['class'] = classname;
+                    }
+
+                },
+
+                selectDice(type) {
+                        if (this.turn == this.me['id'] && this.loading == false) {
+                            var selectedDice = this.dices['all'].find(d => d.type == type);
+                            if (selectedDice['status'] === 0) {
+                                this.changeCardClass("*", "unplayable");
+                                for (let i = 1; i <= 11; i++) {
+                                    var myColumn = this.sortByKeyAsc($.grep(this.me['field'], function (card) {
+                                        return card['column'] === i;
+                                    }), 'row');
+                                    $.each(myColumn, function (index, card) {
+                                        if ((myColumn.length - card['row']) < 3 && (card['type'] === type || card['type'] === 4)) {
+                                            AMgame.changeCardClass(card['id'], "playable");
+                                        }
+                                    });
+                                }
+                                this.$forceUpdate();
+                                this.dices['selected'] = selectedDice;
+                            } else {
+                                this.dices['selected'] = null;
+                                this.changeCardClass("*", "unplayable");
+                                this.$forceUpdate();
+                            }
+                        }
+
+                },
+                deselectDice() {
+                    this.dices['selected'] = null;
+                    this.changeCardClass("*", "normal");
+                    this.$forceUpdate();
+                },
+                checkGame() {
+                    this.gameData(['chat']);
+                    if (this.dices['all'] !== []) {
+                        if (this.turn == this.me['id']) { // Si c'est mon TOUR
+                            // this.gameData(['dices', 'turn']); // Rafraichir dés et tour
+                            // this.checkFight();
+                        } else { // Si TOUR de l'adversaire
+                            this.gameData(['dices', 'turn', 'opponent', 'me']); // Rafraichir dés, tour, plateau adversaire et moi
+                        }
+                    }
+                },
+
+                sortByKeyDesc(array, key) {
+                    return array.sort(function (a, b) {
+                        var x = a[key]; var y = b[key];
+                        return ((x > y) ? -1 : ((x < y) ? 1 : 0));
+                    });
+                },
+                sortByKeyAsc(array, key) {
+                    return array.sort(function (a, b) {
+                        var x = a[key]; var y = b[key];
+                        return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+                    });
+                },
+                scrollMessages() {
+                    let sm = 0;
+                    $('.messages li').each(function (index) {
+                        sm += $(this).height();
+                    });
+                    $('.messages').scrollTop(sm);
+                }
+            },
+            created() {
+                this.gameData(["*"]);
+                setInterval(this.checkGame, 2000);
+                setTimeout(this.scrollMessages, 3000);
+            }
+        });
+
+        function elementCorrections() {
+            let scrollCenter = $('#game').height()/2 + parseFloat($('#game').css('padding-top')) - $(window).height()/2;
+            $('#game-wrap').scrollTop(scrollCenter);
+            $('.sidebar').width(($('body').width() - $('#game-wrap').width())/2);
+
+        }
+        elementCorrections();
+        $(window).resize(function() {
+            elementCorrections();
+        });
+
+    });
+
+</script>
+</body>
+</html>

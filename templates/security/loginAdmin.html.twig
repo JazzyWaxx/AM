@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}- Connexion{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/security/base.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/security/login-admin.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="form-wrapper">
+            <div class="wrap">
+                <a class="logo-link" href="{{ path('home') }}"><img class="logo" src="{{ asset('assets/img/logo/game/logo.svg') }}" alt=""></a>
+                <h1>Connexion Admin</h1>
+
+                <form method="post">
+                    {% if error %}
+                        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                    {% endif %}
+
+                    <label for="inputEmail" class="sr-only">Email</label>
+                    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" placeholder="Adresse email" required autofocus>
+
+                    <label for="inputPassword" class="sr-only">Password</label>
+                    <input type="password" name="password" id="inputPassword" placeholder="Mot de passe" required>
+
+
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                    <button type="submit">Se connecter</button>
+                </form>
+            </div>
+        </div>
+        <div class="visual-wrapper" style="background-image: url({{ asset('assets/img/headerbg.jpg') }})"></div>
+    </div>
+{% endblock %}
+
+{% block js_end %}
+    <script>
+
+        $( document ).ready(function() {
+            $('.logo').width($('.form-wrapper').width());
+            $( window ).resize(function() {
+                $('.logo').width($('.form-wrapper').width());
+            });
+        });
+
+    </script>
+{% endblock %}

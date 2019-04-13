@@ -1,0 +1,41 @@
+{% if pagination.nbPages > 0 %}
+    <ul class="pagination">
+        {% if pagination.page > 1 %}
+            <li>
+                <a href="{{ path(pagination.routeName, pagination.routeParams | merge({'page': 1})) }}">
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+            </li>
+            <li>
+                <a href="{{ path(pagination.routeName,
+                    pagination.routeParams | merge({'page': pagination.page-1})) }}">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+            </li>
+        {% endif %}
+
+        {# Affichage de toutes les pages entre p-4 et p+4 sauf si < 1 ou > nbPages #}
+        {% for p in range(max(pagination.page - 4, 1), min(pagination.page + 4, pagination.nbPages)) %}
+            <li {% if p == pagination.page %}class="active"{% endif %}>
+                <a href="{{ path(pagination.routeName, pagination.routeParams | merge({'page': p})) }}">
+                    {{ p }}
+                </a>
+            </li>
+        {% endfor %}
+
+        {% if pagination.page < pagination.nbPages %}
+            <li>
+                <a href="{{ path(pagination.routeName,
+                    pagination.routeParams | merge({'page': pagination.page + 1})) }}">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+            </li>
+            <li>
+                <a href="{{ path(pagination.routeName,
+                    pagination.routeParams | merge({'page': pagination.nbPages})) }}">
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+{% endif %}

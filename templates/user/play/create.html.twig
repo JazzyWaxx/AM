@@ -1,0 +1,70 @@
+{% extends 'user/base.html.twig' %}
+
+{% block title %}Créer une partie{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/user/base.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/user/play/create.css') }}">
+{% endblock %}
+
+{% block js_src %}
+{% endblock %}
+
+{% block body %}
+
+    <div class="square-1 random">
+        <div class="square-wrapper">
+            <a href="{{ path('user_play_create_game') }}">Partie<br/> ouverte</a>
+        </div>
+    </div>
+
+    <div class="square-1 other-1">
+        <div class="square-2 list invite-friend">
+            <div class="square-wrapper">
+                <div class="list-title">Inviter un ami</div>
+                <ul>
+                    {% if friends is not empty %}
+                        {% for friend in friends %}
+                            <li>
+                                <div class="user-username">
+                                    {{ friend.username }}
+                                    {% if friend.lastConnected is not empty %}
+                                        <small class="last-connected">{{ friend.lastConnected }}</small>
+                                    {% endif %}
+                                </div>
+                                <div class="action">
+                                    <a href="{{ path('user_play_create_game', {'id': friend.id}) }}"><i class="fas fa-share"></i></a>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="square-2 list invite-random">
+            <div class="square-wrapper">
+                <div class="list-title">Inviter un joueur aléatoire</div>
+                <ul>
+                    {% if suggestions is not empty %}
+                        {% for suggestion in suggestions %}
+                            <li>
+                                <div class="user-username">
+                                    {{ suggestion.username }}
+                                </div>
+                                <div class="action">
+                                    <a href="{{ path('user_play_create_game', {'id': 23}) }}"><i class="fas fa-share"></i></a>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block js_end %}
+{% endblock %}

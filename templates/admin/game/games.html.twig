@@ -1,0 +1,131 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}
+    - Parties
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/admin/table.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/admin/games.css') }}">
+{% endblock %}
+{% block js_src %}
+{% endblock %}
+
+{% block body %}
+    <div class="content-filter">
+        <form action="">
+            <input type="text" placeholder="Rechercher dans les parties">
+            <label for="filter"></label>
+            <select id="filter">
+                <option>Par date de création (Ne marche pas encore)</option>
+            </select>
+        </form>
+    </div>
+    <div class="content-list">
+        <table>
+            <thead>
+            <tr>
+                <td>Partie n°</td>
+                <td>Joueurs</td>
+                <td>Gagnant</td>
+                <td>Date de création</td>
+                <td>Joué pour la dernière fois</td>
+                <td>Status</td>
+            </tr>
+            </thead>
+            <tbody>
+                {% if games is not empty %}
+                    {% for game in games %}
+                        <tr data-id="{{ game.id }}">
+                            <td class="game-id">
+                                <strong>{{ game.id }}</strong>
+                                <ul class="action">
+                                    <li>
+                                        <a data-action="delete-game" href="{{ path('admin_game_delete', {'id': game.id}) }}">
+                                            Supprimer
+                                        </a>
+                                    </li>
+                                </ul>
+                            </td>
+                            <td>
+                                <a href="{{ path('admin_user_profile', {'id': game.playerOne.id }) }}">{{ game.playerOne.username }}</a>
+                                {% if game.playerTwo is not null %}
+                                    ,<a href="{{ path('admin_user_profile', {'id': game.playerTwo.id }) }}">{{ game.playerTwo.username }}</a>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if game.winner is not null %}
+                                    <a href="{{ path('admin_user_profile', {'id': game.winner.id }) }}">{{ game.winner.username }}</a>
+                                {% endif %}
+                            </td>
+                            <td>{{ game.createdAt | date("d/m/Y") }}</td>
+                            <td>{{ game.endedAt | date("d/m/Y") }}</td>
+                            <td>
+                                {% if game.winner is not null %}
+                                    Terminée
+                                {% else %}
+                                    En cours
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td>Aucune partie</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                {% endif %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <td>Partie n°</td>
+                <td>Joueurs</td>
+                <td>Gagnant</td>
+                <td>Date de création</td>
+                <td>Joué pour la dernière fois</td>
+                <td>Status</td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+    {% include 'pagination.html.twig' %}
+{% endblock %}
+
+{% block js_end %}
+    <script>
+
+        $(".action li a").click(function(event) {
+            event.preventDefault();
+
+            var action = $(this).attr("data-action");
+            var confirmMsg = "Etes-vous sûr de ";
+            if (action == "delete-game") {
+                confirmMsg += "supprimer";
+            }
+            confirmMsg += " cette partie?";
+            var answer = confirm(confirmMsg);
+            if (answer) {
+                var url = this.href;
+                deleteGame($(this),url);
+            }
+        });
+
+        async function deleteGame(link,url) {
+
+            var gameElement = link.closest("tr");
+            let resultDelete = await axios.get(url);
+            resultDelete = resultDelete.data;
+
+            if (resultDelete.code == 200) {
+                gameElement.remove();
+            }
+        }
+
+
+
+    </script>
+{% endblock %}

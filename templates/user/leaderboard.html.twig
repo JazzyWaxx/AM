@@ -1,0 +1,40 @@
+{% extends 'user/base.html.twig' %}
+
+{% block title %}Classement{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/user/base.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/user/leaderboard.css') }}">
+{% endblock %}
+
+{% block js_src %}
+{% endblock %}
+
+{% block body %}
+
+    <div class="square-1 list my-statistics">
+        <div id="player-statistics">
+            <p class="username"><i class="fas fa-user"></i> {{ app.user.username }}</p>
+            <span><i class="fas fa-level-up-alt"></i> Rang: 12</span>
+            <span><i class="fas fa-list"></i> Parties: {{ games }}</span>
+            <span><i class="fas fa-trophy"></i> Victoires: {{ wins }}</span>
+
+        </div>
+    </div>
+
+    <div class="square-1 list all-statistics">
+        <div class="list-title">Classement général</div>
+        <table>
+            <thead>
+            <tr>
+                <td>Rang</td><td>Joueur</td><td>Parties</td><td>Victoires</td>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+{% endblock %}
+
+{% block js_end %}
+{% endblock %}

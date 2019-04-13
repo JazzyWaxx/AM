@@ -1,0 +1,319 @@
+@font-face {
+    font-family: "Rotulista";
+    src: url("../fonts/Rotulista-Regular.otf");
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --main-grid-column: 5.4vw;
+    --main-grid-row: 7.3vw;
+    --main-grid-gap: 0.2vw;
+    --main-grid-columns: 11;
+}
+
+li {
+    list-style-type: none;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    background-color: #eee;
+}
+
+#container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    background-position: center;
+    background-size: cover;
+}
+
+.turn-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1vw 1vw;
+    z-index: 100;
+    width: 100%;
+    margin: auto;
+    position: fixed;
+}
+
+.turn-info p {
+    font-family: "Rotulista", cursive;
+    font-size: 3vw;
+    color: white;
+    cursor: default;
+    text-shadow: 0px 0px 10px rgba(0, 0, 0, 1);
+}
+
+.sidebar {
+    width: auto;
+    height: 100%;
+    background-color: transparent;
+    display: flex;
+    flex-direction: column;
+}
+
+.s-left {
+    justify-content: flex-end;
+}
+.s-right {
+    justify-content: space-between;
+}
+
+
+/* GAME */
+
+#game-wrap {
+    height: 100%;
+    overflow: scroll;
+    width: auto;
+}
+
+#game {
+    padding: 2vw;
+    display: inline-block;
+    margin: auto;
+    background-color: transparent;
+}
+
+#dices {
+    padding-top: 3vw;
+    padding-right: 3vw;
+    width: 100%;
+    height: 15vw;
+    background-position: top right;
+    background-size: 120%;
+    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.dice {
+    display: flex;
+    flex-direction: row;
+}
+
+#dices p {
+    color: white;
+}
+
+.dice li:not(:last-child) {
+    margin-right: 1vw;
+}
+
+.dice li div {
+    font-size: 1vw;
+    padding: 1vw;
+    cursor: default;
+}
+
+.dice1 div {
+    background-color: blue;
+}
+
+.dice2 div {
+    background-color: yellow;
+}
+
+.dice3 div {
+    background-color: red;
+}
+
+.dice li .played {
+    background-color: grey;
+}
+
+#chat {
+    width: 100%;
+    height: 20vw;
+    background-position: bottom left;
+    background-size: 92%;
+    background-repeat: no-repeat;
+    padding-left: 3.8vw;
+    padding-right: 2.4vw;
+}
+
+.messages {
+    overflow: scroll;
+    height: 14.5vw;
+    width: 100%;
+    margin-top: 2vw;
+    display: inline-block;
+
+}
+
+.messages::-webkit-scrollbar {
+    display: none;
+}
+
+.messages li {
+    width: 100%;
+    display: flex;
+    position: relative;
+    cursor: default;
+    font-family: "Rotulista", cursive;
+}
+
+.messages li span {
+    position: relative;
+    right: 0;
+    padding: 0.4vw 0.6vw;
+    border-radius: 0.2vw;
+    background-color: #7F6449;
+    color: white;
+    font-size: 0.8vw;
+}
+
+.messages li div {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.m-opponent {
+    padding-right: 4vw;
+    justify-content: flex-start;
+}
+
+.m-me {
+    padding-left: 4vw;
+    justify-content: flex-end;
+}
+
+.chat-form {
+    display: flex;
+    flex-direction: row;
+    border: 0.2vw solid #7F6449;
+    overflow: hidden;
+    border-radius: 0.5vw;
+}
+
+.chat-form input, .chat-form button {
+    padding: 0.4vw;
+    font-family: "Rotulista", cursive;
+    border: none;
+    font-size: 0.8vw;
+}
+.chat-form input {
+    outline: none;
+    width: 80%;
+    color: #7F6449;
+}
+
+.chat-form button {
+    width: 20%;
+    color: #7F6449;
+    background-color: white;
+    cursor: pointer;
+    outline: none;
+}
+
+
+.game-dice-wrap {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.game-dice {
+    position: fixed;
+    bottom: 0;
+    height: 100px;
+    background-color: #404040;
+}
+
+#game ul li {
+    list-style-type: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 10px;
+    color: white;
+    cursor: default;
+}
+
+#gamePath {
+    display: grid;
+    grid-template-columns: repeat(var(--main-grid-columns), var(--main-grid-column));
+    grid-template-rows: var(--main-grid-row);
+    grid-gap: var(--main-grid-gap);
+}
+
+.game-field {
+    -webkit-box-shadow: 10px -10px 5px -3px rgba(0,0,0,0.5);
+    -moz-box-shadow: 10px -10px 5px -3px rgba(0,0,0,0.5);
+    box-shadow: 10px -10px 5px -3px rgba(0,0,0,0.5);
+}
+
+#gamePath li {
+    background-color: #ddd;
+    grid-column: 1  / span 12;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.player-area {
+    display: grid;
+    grid-template-columns: repeat(var(--main-grid-columns), var(--main-grid-column));
+    grid-gap: var(--main-grid-gap);
+    margin: var(--main-grid-gap) 0vw ;
+    grid-template-rows: repeat(10, var(--main-grid-row));
+}
+
+.player-area li {
+    background-position: center;
+    background-size: 102%;
+    background-repeat: no-repeat;
+    border-width: 0px;
+    border-style: solid;
+    border-color: transparent;
+    border-radius: 5px;
+    overflow: hidden;
+    -webkit-box-shadow: 5px -5px 5px -3px rgba(0,0,0,0.5);
+    -moz-box-shadow: 5px -5px 5px -3px rgba(0,0,0,0.5);
+    box-shadow: 5px -5px 5px -3px rgba(0,0,0,0.5);
+}
+
+#playerB {
+    transform: rotate(180deg);
+}
+
+
+
+.card-filter {
+    height: 100%;
+    width: 100%;
+    opacity: 0;
+    background-color: black;
+    transition: opacity 0.2s ease-in-out;
+}
+
+#playerA .unplayable .card-filter {
+    opacity: 0.5;
+}
+
+#playerA .playable .card-filter {
+    opacity: 0;
+}
+

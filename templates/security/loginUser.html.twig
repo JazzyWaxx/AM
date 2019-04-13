@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}- Connexion{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/security/base.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/security/login.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="form-wrapper">
+            <div class="wrap">
+                <a class="logo-link" href="{{ path('home') }}"><img class="logo" src="{{ asset('assets/img/logo/game/logo.svg') }}" alt=""></a>
+                <h1>Connexion</h1>
+
+                <form method="post">
+                    {% if error %}
+                        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                    {% endif %}
+
+                    <label for="inputEmail" class="sr-only">Email</label>
+                    <input type="text" value="{{ last_username }}" name="email" id="inputEmail" placeholder="Nom d'utilisateur ou mail" required autofocus>
+
+                    <label for="inputPassword" class="sr-only">Password</label>
+                    <input type="password" name="password" id="inputPassword" placeholder="Mot de passe" required>
+                    <a class="forgotten-password" href="{{ path('security_forgotten_password') }}">Mot de passe oublié?</a>
+
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                    <button type="submit">Se connecter</button>
+                </form>
+                <p class="reminder">Vous n'avez pas encore de compte? <a href="{{ path('security_signup') }}">Rejoignez l'aventure!</a></p>
+                <div class="admin-login-link"><a href="{{ path('security_login_admin') }}">Connexion Admin</a></div>
+            </div>
+        </div>
+        <div class="visual-wrapper" style="background-image: url({{ asset('assets/img/login-register.svg') }})"></div>
+    </div>
+{% endblock %}
+
+{% block js_end %}
+    <script>
+
+        $( document ).ready(function() {
+            $('.logo').width($('.form-wrapper').width());
+            $( window ).resize(function() {
+                $('.logo').width($('.form-wrapper').width());
+            });
+        });
+
+    </script>
+{% endblock %}

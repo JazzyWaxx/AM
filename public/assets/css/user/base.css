@@ -1,0 +1,300 @@
+@import url('https://fonts.googleapis.com/css?family=Lilita+One|Luckiest+Guy|KG Second Chances');
+
+@font-face {
+    font-family: "KG Second Chances";
+    src: url("../fonts/KGSecondChancesSolid.ttf");
+}
+
+::-webkit-scrollbar {
+    display: none;
+    width: 0 !important;
+}
+
+:root {
+    --main-header-width: 200px;
+    --main-border-block: 1px solid #d6d4e1;
+    --main-space-between: 1vw;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    list-style-type: none;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+li {
+    list-style-type: none;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+.container {
+    background-color: #e5e5e5;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.content-wrapper {
+    width: 70%;
+}
+
+.loader{
+    background-color: white;
+    cursor: wait;
+    height: 100%;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loader img {
+    width: 20%;
+    animation-name: loaderLogo;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes loaderLogo {
+    0% { transform: scale(1) translateY(0); }
+    20%   { transform: scale(1.05) translateY(-5%) ; }
+    100% { transform: scale(1) translateY(0); }
+}
+
+/* MENU */
+
+header nav {
+    background-color: #353754;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+header .menu {
+    display: flex;
+    flex-direction: row;
+}
+
+header nav ul li {
+    font-size: 1.4vw;
+}
+
+header nav .menu li {
+    font-family: "KG Second Chances", cursive;
+    color: white;
+    border-right: 0.1vw solid #242539;
+}
+
+header nav .menu li a i {
+    margin-right: 5px;
+}
+
+header nav .menu li a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1vw;
+    height: 100%;
+    width: 100%;
+}
+
+header nav .logged-user-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+header nav .logged-user-info li {
+    font-family: "KG Second Chances", cursive;
+}
+
+header nav .logged-user-info li a {
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
+header nav .logged-user-username {
+    font-family: "KG Second Chances", cursive;
+    padding: 1vw;
+    color: white;
+    border-right: 0.1vw solid #242539;
+}
+
+header nav .logged-user-logout {
+    color: white;
+    transition: color 0.1s ease-in-out;
+}
+
+header nav .logged-user-logout:hover {
+    color: #FAC52D;
+}
+
+header nav .logged-user-logout a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1vw;
+    height: 100%;
+    width: 100%;
+}
+
+/* CONTENT */
+
+.content {
+    margin-top: var(--main-space-between);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.square-1 {
+    width: calc(50% - var(--main-space-between)/2);
+}
+
+.other-1 {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.square-2 {
+    width: 100%;
+    height: calc(50% - var(--main-space-between)/2);
+}
+
+.other-2 {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.square-3 {
+    width: calc(50% - var(--main-space-between)/2);
+}
+
+.square-1, .square-2, .square-3 {
+    background-size: auto 80%;
+    background-position: bottom center;
+    background-repeat: no-repeat;
+}
+
+.square-1 .square-wrapper > a, .square-2 .square-wrapper > a, .square-3 .square-wrapper > a {
+    font-family: "KG Second Chances", cursive;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.square-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+.square-1 .square-wrapper > a {
+    font-size: 5vw;
+}
+
+.square-2 .square-wrapper > a {
+    font-size: 2.5vw;
+}
+
+.square-3 .square-wrapper > a {
+    font-size: 2vw;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+}
+
+.list-title {
+    font-family: "KG Second Chances", cursive;
+    color: white;
+    font-size: 1vw;
+    padding: 0.8vw;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.list ul {
+    overflow: scroll;
+    height: 100%;
+    width: 100%;
+}
+
+.list ul::-webkit-scrollbar {
+    display: none;
+}
+
+.list ul li {
+    font-family: "KG Second Chances", cursive;
+    color: #353754;
+    background-color: white;
+    padding: 0.8vw;
+    font-size: 0.9vw;
+    border-bottom: 1px solid #e6e5ec;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.action a:not(:last-child) {
+    margin-right: 0.5vw;
+}
+
+.list ul li:last-child {
+    border: none;
+}
+
+/*PAGINATION*/
+
+.pagination {
+    display: flex;
+    justify-content: center;
+}
+.pagination li {
+    font-family: "KG Second Chances", cursive;
+    background-color: white;
+    border: var(--main-border-block);
+    display: flex;
+    font-size: 12px;
+}
+
+.pagination li:not(:last-child) {
+    margin-right: 3px;
+}
+
+.pagination li a {
+    position: relative;
+    padding: 5px 10px;
+    height: 100%;
+    width: 100%;
+    color: black;
+}
+

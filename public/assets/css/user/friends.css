@@ -1,0 +1,33 @@
+.list {
+    background-color: #615d84;
+}
+
+.list-title {
+    background-color: #504D6C;
+}
+
+.friends .last-connected {
+    margin-left: 0.2vw;
+}
+
+.friend-search form {
+    width: 100%;
+}
+
+.friend-search form input {
+    font-family: "Viga", cursive;
+    color: #606D71;
+}
+
+.friend-search input[type=text] {
+    width: 100%;
+    padding: 0.8vw;
+    font-size: 1vw;
+    border: none;
+    outline: none;
+    border-bottom: 2px solid #504D6C;
+}
+
+.friend-search input[type=submit] {
+    display: none;
+}

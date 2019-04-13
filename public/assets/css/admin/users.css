@@ -1,0 +1,29 @@
+.user-username {
+    display: flex;
+    flex-direction: row;
+}
+
+.user-username img {
+    vertical-align: middle;
+    height: 32px;
+    width: 32px;
+}
+
+.user-username strong {
+    margin-left: 10px;
+    align-self: center;
+    color: #504D6C;
+    font-weight: initial;
+}
+
+.user-status-connected {
+    color: #5f9763;
+}
+
+.user-status-banned {
+    color: #edb615;
+}
+
+.user-status-deactivated {
+    color: #f25a5a;
+}

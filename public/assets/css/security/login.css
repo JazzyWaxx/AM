@@ -1,0 +1,34 @@
+form label {
+    display: none;
+}
+
+form input[type=password] {
+    margin-bottom: 4px;
+}
+
+.forgotten-password {
+    font-family: 'KG Second Chances', cursive;
+    font-size: 0.8vw;
+    color: #787878;
+    margin-bottom: 10px;
+}
+
+.admin-login-link {
+    position: absolute;
+    bottom: 0;
+    margin: auto;
+    width: 100%;
+    font-family: 'KG Second Chances', cursive;
+    background-color: #CF2F3F;
+    outline: none;
+    display: flex;
+}
+
+.admin-login-link a {
+    color: #FFFFFF;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    font-size: 1vw;
+    padding: 0.6vw;
+}

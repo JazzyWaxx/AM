@@ -1,0 +1,31 @@
+{% extends 'user/base.html.twig' %}
+
+{% block title %}Classement{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/user/base.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/user/profile.css') }}">
+{% endblock %}
+
+{% block js_src %}
+{% endblock %}
+
+{% block body %}
+
+    <div class="square-1 list picture" style="background-image: url({{ picture }})">
+        <div class="square-wrapper"><i class="fas fa-user-edit"></i></div>
+    </div>
+
+    <div class="square-1 list info">
+        {{ form_start(form) }}
+        {{ form_row(form.username, {'label': false, 'attr': {'placeholder': "Nom d\'utilisateur", 'value': username}}) }}
+        {{ form_row(form.password, {'label': false, 'required': false, 'attr': {'placeholder': "Mot de passe"}}) }}
+        {{ form_row(form.confirm_password, {'label': false, 'required': false, 'attr': {'placeholder': "Confirmer votre mot de passe"}}) }}
+        <button type="submit">Mettre à jour</button>
+        {{ form_end(form) }}
+    </div>
+
+{% endblock %}
+
+{% block js_end %}
+{% endblock %}

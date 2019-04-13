@@ -1,0 +1,145 @@
+@import url('https://fonts.googleapis.com/css?family=Lilita+One|Luckiest+Guy|Viga');
+
+:root{
+    --main-sidebar-width: 14%;
+    --main-border-block: 1px solid #d6d4e1;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    list-style-type: none;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+li {
+    list-style-type: none;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+.container {
+    width: 100%;
+    height: 100%;
+}
+
+/* SIDEBAR */
+
+.sidebar-menu {
+    position: relative;
+    width: var(--main-sidebar-width);
+    min-width: 150px;
+    height: 100%;
+    float: left;
+    overflow: scroll;
+    border-right: var(--main-border-block);
+}
+
+.sidebar-menu::-webkit-scrollbar {
+    display: none;
+}
+
+.logo-wrap {
+    width: 100%;
+    padding: 30px;
+    background-color: #F7AF42;
+}
+
+.logo-wrap img {
+    width: 100%;
+}
+
+.sidebar-menu ul {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-menu ul li {
+    width: 100%;
+    font-size: 13px;
+    display: flex;
+    color: #504D6C;
+    transition: all 0.1s ease-in;
+}
+
+.sidebar-menu ul li:hover:not(.active) {
+    background-color: #f7f6f9;
+    color: #353754;
+}
+
+.sidebar-menu ul li a {
+    font-family: "Viga", cursive;
+    width: 100%;
+    padding: 20px;
+}
+
+.active {
+    background-color: #ebebf0;
+    color: #353754;
+}
+
+.btn-logout {
+    width: 100%;
+    padding: 20px;
+    font-family: "Viga", cursive;
+    text-align: center;
+    color: white;
+    position: absolute;
+    bottom: 0;
+    background-color: #504D6C;
+    transition: background-color 0.1s ease-in-out;
+}
+
+.btn-logout:hover {
+    background-color: #C01C2F;
+}
+
+/* CONTENT */
+
+.content {
+    padding: 20px;
+    height: 100%;
+    float: left;
+    width: calc(100% - var(--main-sidebar-width));
+    background-color: #e6e5ec;
+    overflow: scroll;
+    position: relative;
+}
+
+.content::-webkit-scrollbar {
+    display: none;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+}
+.pagination li {
+    font-family: "Viga", cursive;
+    background-color: white;
+    border: var(--main-border-block);
+    display: flex;
+    font-size: 12px;
+}
+
+.pagination li:not(:last-child) {
+    margin-right: 3px;
+}
+
+.pagination li a {
+    position: relative;
+    padding: 5px 10px;
+    height: 100%;
+    width: 100%;
+    color: black;
+}
+

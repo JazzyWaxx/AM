@@ -1,0 +1,53 @@
+.list {
+    background-color: #d74e5c;
+}
+
+.list-title {
+    background-color: #CF2F3F;
+}
+
+.list ul li {
+    padding: 0;
+}
+
+.list ul li a {
+    width: 100%;
+    padding: 0.8vw;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.all-notifications ul li a .friend-username {
+    font-size: 1vw;
+}
+
+.all-notifications ul li a .preview {
+    display: flex;
+    font-size: 0.8vw;
+    color: #728287;
+}
+
+.all-notifications ul li a .last-date {
+    display: flex;
+    font-size: 1vw;
+}
+
+.action a:not(:last-child) {
+    margin-right: 0.5vw;
+}
+
+.notification-content {
+    font-family: "Viga", cursive;
+    background-color: white;
+    padding: 1vw;
+    height: 100%;
+    width: 100%;
+    color: #3f3f3f;
+}
+
+.notification-content .date {
+    font-size: 0.8vw;
+    color: #919191;
+}

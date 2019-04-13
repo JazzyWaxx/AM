@@ -1,0 +1,28 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}- Envoyer un mail{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/admin/email.css') }}">
+{% endblock %}
+
+{% block js_src %}
+{% endblock %}
+
+{% block body %}
+    <div class="form-wrapper">
+        <h1>Envoi de mail à la communauté</h1>
+        {{ form_start(form) }}
+
+        {{ form_row(form.subject, {'label': false, 'attr': {'placeholder': "Sujet"}}) }}
+        {{ form_row(form.content, {'label': false, 'attr': { 'placeholder': 'Message'}}) }}
+
+        <button type="submit">Envoyer</button>
+
+        {{ form_end(form) }}
+    </div>
+
+{% endblock %}
+
+{% block js_end %}
+{% endblock %}
