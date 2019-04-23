@@ -128,7 +128,7 @@
                 loading: false,
             },
             methods: {
-                async gameData(array) {
+                async gameData(array) {  // array = ["game", "dices", "opponent", ...] -> update la vue
                     let result = await axios.get(Routing.generate('game_data', {game: '{{ gameId }}'}));
                     result = result.data;
                     $.each(array, function (i, data) {
@@ -193,7 +193,7 @@
 
                         }
                     })
-                }, // array = ["game", "dices", "opponent", ...] -> update la vue
+                },
                 async changeDiceStatus(type) {
                     let result = await axios.get(Routing.generate('game_change_dice_status', {game: this.game['id'], type: type}));
                     result = result.data;
