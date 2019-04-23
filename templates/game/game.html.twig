@@ -126,6 +126,7 @@
                 turn: null,
                 fight: false,
                 loading: false,
+                fighting: false
             },
             methods: {
                 async gameData(array) {  // array = ["game", "dices", "opponent", ...] -> update la vue
@@ -194,101 +195,125 @@
                         }
                     })
                 },
-                async changeDiceStatus(type) {
-                    let result = await axios.get(Routing.generate('game_change_dice_status', {game: this.game['id'], type: type}));
-                    result = result.data;
-                    if (result.code === 200) {
-                        return true;
-                    }
+                changeDiceStatus(type) {
+                    return axios.get(Routing.generate('game_change_dice_status', {game: this.game['id'], type: type}));
                 },
-                async moveCard(id, value = null, user = this.me['id'], dice = true) {
+                moveCard(id, value = null, user = this.me['id'], dice = true) {
+
                     if (!this.loading) {
 
-                        this.loading = true;
-                        var card = this.me['field'].find(c => c.id === id);
+                        if (dice && this.dices['selected'] !== null) { // SI MOUVEMENT Dé
 
-                        if (dice) { // si mouvement avec dé
+                            this.loading = true;
 
+                            let card = this.me['field'].find(c => c.id === id);
                             let columnCard = this.sortByKeyAsc($.grep(this.me['field'], function (c) {
                                 return c['column'] === card['column'];
                             }), 'row');
 
                             let selectedDice = this.dices['selected'];
-                            let moveValue = selectedDice['value'];
+                            value = selectedDice['value'];
 
-                            if (selectedDice.length !== 0 && this.turn == this.me['id'] && (columnCard.length - card['row'] < 3) && (card['type'] == selectedDice['type'] || card['type'] == 4)) {
-                                console.log("test");
+                            if (selectedDice.length !== 0 && this.turn === this.me['id'] && (columnCard.length - card['row'] < 3) && (card['type'] === selectedDice['type'] || card['type'] === 4)) {
                                 this.preMoveCard(id, selectedDice['value']);
                                 this.preChangeDiceStatus(selectedDice['type']);
 
-                                let result = await axios.get(Routing.generate('game_move_card', {game: this.game['id'], user: user, card: id, value: moveValue}));
-                                result = result.data;
-                                if (result.code === 200) {
-                                    if (this.changeDiceStatus(selectedDice['type'])) {
+                                axios.get(Routing.generate('game_move_card', {game: this.game['id'], user: user, card: id, value: value})) // MOVE CARD
+                                .then(response => { // 200
+
+                                    this.changeDiceStatus(selectedDice['type']) // CHANGE DICE STATUS
+                                    .then(response => { // 200
+
                                         this.deselectDice();
+                                        this.dices['played'] ++;
+                                        if (this.dices['played'] === 3) { // SI TOUS LES DES SONT JOUES
+                                            this.turn = this.opponent['id'];
+                                            this.nextTurn().finally(() => {
+                                                this.loading = false;
+                                            })
+                                        } else { // SI DES ENCORE DISPO
+                                            this.gameData(["*"]).finally(() => {
+                                                this.loading = false;
+                                            });
+                                        }
+
+                                    }).catch(error => { // !200
+                                        this.gameData(["*"]);
+                                        console.log("Erreur " + error.response.status);
                                         this.loading = false;
-                                        this.checkFight();
-                                    }
-                                } else {
+                                    });
+
+                                }).catch(error => { // !200
                                     this.dices['selected'] = selectedDice;
-                                }
-                                this.gameData(["*"]);
-                            }
-                        } else { // si mouvement (arrière) de combat ex: this.moveCard(12, -1, false);
-                            if (value !== null) {
-                                let result = await axios.get(Routing.generate('game_move_card', {game: this.game['id'], user: user, card: id, value: value}));
-                                result = result.data;
-                                if (result.code === 200) {
-                                    console.log("Carte bougée en arrière");
+                                    this.gameData(["*"]);
+                                    console.log("Erreur " + error.response.status);
                                     this.loading = false;
-                                } else {
-                                    console.log("Carte pas bougée en arrière");
-                                }
+                                })
+                            }
+                        } else { // si mouvement en arrière d'un combat à égalité (donc sans dé) ex: this.moveCard(12, -1, false);
+
+                            if (value !== null) {
+
+                                this.loading = true;
+
+                                axios.get(Routing.generate('game_move_card', {game: this.game['id'], user: user, card: id, value: value}))
+                                .then(response => {
+                                    if (response.status === 200) {
+                                        console.log("Carte bougée en arrière");
+                                    } else {
+                                        console.log("Carte pas bougée en arrière");
+                                    }
+                                    this.loading = false;
+                                }).catch(error => {
+                                    console.log("Erreur " + error.response.status);
+                                    this.loading = false;
+                                });
+
                             }
                         }
 
                     }
 
-
                 },
-                async nextTurn() {
+                nextTurn() {
                     this.deselectDice();
                     this.turn = this.opponent['id'];
-                    let result = await axios.get(Routing.generate('game_next_turn', {game: this.game['id']}));
-                    result = result.data;
-                    if (result.code == 200) {
-                        this.gameData(["dices", "turn", "opponent"]);
-                    }
+                    return axios.get(Routing.generate('game_next_turn', {game: this.game['id']}));
                 },
-                async checkFight() {
-                    if (!this.loading) {
+                checkFight() {
+                    console.log("fighting:" + this.fighting);
+                    if (!this.fighting) {
+                        this.fighting = true;
                         for (i = 1; i <= 11; i++) {
                             var myColumn = this.sortByKeyAsc($.grep(this.me['field'], function (card) {
-                                return card['column'] == i;
+                                return card['column'] === i;
                             }), 'row');
                             var opponentColumn = this.sortByKeyAsc($.grep(this.opponent['field'], function (card) {
-                                return card['column'] == 12-i;
+                                return card['column'] === 12-i;
                             }), 'row');
 
                             if (myColumn.length !== 0 && opponentColumn.length !== 0) {
 
-                                console.log("Combat à la colonne "+i);
                                 myCard = myColumn[myColumn.length - 1];
                                 opponentCard = opponentColumn[opponentColumn.length - 1];
                                 console.log(myCard);
                                 console.log(opponentCard);
                                 let typeDiff = myCard['type'] - opponentCard['type'];
                                 let powerDiff = myCard['strengh'] - opponentCard['strengh'];
-                                console.log("Différence de type: "+typeDiff);
-                                console.log("Différence de force: "+powerDiff);
+                                console.log("Différence de type: " + typeDiff);
+                                console.log("Différence de force: " + powerDiff);
                                 var looser = null;
 
                                 if (typeDiff === 0) { // same card type
 
-                                    if (powerDiff === 0) { // égualité
+                                    if (powerDiff === 0) { // égalité
 
                                         console.log("égalité");
-                                        this.moveCard(myCard['id'], -1, this.me['id'], false).then(this.moveCard(opponentCard['id'], -1, this.opponent['id'], false));
+                                        this.moveCard(myCard['id'], -1, this.me['id'], false).then(() => {
+                                            this.moveCard(opponentCard['id'], -1, this.opponent['id'], false).then(() => {
+                                                this.fighting = false;
+                                            });
+                                        });
 
                                         this.gameData(["me", "opponent"]);
                                         this.checkFight();
@@ -335,50 +360,46 @@
 
                                 }
 
-                                if (looser == this.me['id']) {
-                                    console.log(this.me['id']);
-                                    result = await axios.get(Routing.generate('game_card_delete', {game: this.game['id'], userid: this.me['id'], cardid: myCard['id']}));
-                                    result = result.data;
-                                    console.log(result);
-                                    if (result.code == 200) {
+                                if (looser === this.me['id']) {
+                                    this.deleteCard(myCard['id'])
+                                    .then(response => {
                                         console.log("carte supprimée");
+                                        delete myCard;
+                                        this.$forceUpdate();
                                         this.gameData(["me", "opponent"]);
-                                        this.checkFight();
-                                    }
-                                } else if (looser == this.opponent['id']) {
-                                    console.log(this.opponent['id']);
-                                    var result = await axios.get(Routing.generate('game_card_delete', {game: this.game['id'], userid: this.opponent['id'], cardid: opponentCard['id']}));
-                                    result = result.data;
-                                    console.log(result);
-                                    if (result.code == 200) {
+                                        this.fighting = false;
+                                    });
+                                } else if (looser === this.opponent['id']) {
+                                    this.deleteCard(opponentCard['id'])
+                                    .then(response => {
                                         console.log("carte supprimée");
+                                        delete opponentCard;
+                                        this.$forceUpdate();
                                         this.gameData(["me", "opponent"]);
-                                        this.checkFight();
-                                    }
+                                        this.fighting = false;
+                                    });
                                 }
 
 
                             }
                         }
+                        this.fighting = false;
                     }
                 },
-                async sendMessage() {
+                deleteCard(cardId) {
+                    return axios.get(Routing.generate('game_card_delete', {game: this.game['id'], userid: this.me['id'], cardid: cardId}))
+                },
+                sendMessage() {
                     let message = {
                         id: this.me['id'],
                         message: this.game['message'],
                         date: new Date()
                     };
-
                     if (this.game['message'] !== "") {
                         this.preSendMessage(message);
                         this.game['message'] = "";
-                        /*AMgame.game['messages'].push(message);
-                        console.log(this.game['messages']);
-                        this.$forceUpdate();*/
-                        let result = await axios.get(Routing.generate('game_message_send', {game: this.game['id'], json: JSON.stringify(message)}));
-                        result = result.data;
+                        return axios.get(Routing.generate('game_message_send', {game: this.game['id'], json: JSON.stringify(message)}));
                     }
-
                 },
                 preSendMessage(message) {
                     this.game['messages'].push(message);
@@ -419,6 +440,7 @@
                     let dice = this.dices['all'].find(d => d.type === type);
                     dice['status'] = 1;
                     this.dices['selected'] = null;
+                    this.$forceUpdate();
                 },
 
                 changeCardClass(id, classname) {
@@ -434,43 +456,46 @@
                 },
 
                 selectDice(type) {
-                        if (this.turn == this.me['id'] && this.loading == false) {
-                            var selectedDice = this.dices['all'].find(d => d.type == type);
-                            if (selectedDice['status'] === 0) {
-                                this.changeCardClass("*", "unplayable");
-                                for (let i = 1; i <= 11; i++) {
-                                    var myColumn = this.sortByKeyAsc($.grep(this.me['field'], function (card) {
-                                        return card['column'] === i;
-                                    }), 'row');
-                                    $.each(myColumn, function (index, card) {
-                                        if ((myColumn.length - card['row']) < 3 && (card['type'] === type || card['type'] === 4)) {
-                                            AMgame.changeCardClass(card['id'], "playable");
-                                        }
-                                    });
-                                }
-                                this.$forceUpdate();
-                                this.dices['selected'] = selectedDice;
-                            } else {
-                                this.dices['selected'] = null;
-                                this.changeCardClass("*", "unplayable");
-                                this.$forceUpdate();
+                    console.log(this.loading);
+                    if (this.turn === this.me['id'] && !this.loading) {
+                        var selectedDice = this.dices['all'].find(d => d.type === type);
+                        if (selectedDice['status'] === 0) {
+                            console.log('dé sélectionné');
+                            this.changeCardClass("*", "unplayable");
+                            for (let i = 1; i <= 11; i++) {
+                                var myColumn = this.sortByKeyAsc($.grep(this.me['field'], function (card) {
+                                    return card['column'] === i;
+                                }), 'row');
+                                $.each(myColumn, function (index, card) {
+                                    if ((myColumn.length - card['row']) < 3 && (card['type'] === type || card['type'] === 4)) {
+                                        AMgame.changeCardClass(card['id'], "playable");
+                                    }
+                                });
                             }
+                            this.$forceUpdate();
+                            this.dices['selected'] = selectedDice;
+                        } else {
+                            console.log('Impossible de sélectionner le dé');
+                            this.dices['selected'] = null;
+                            this.changeCardClass("*", "unplayable");
+                            this.$forceUpdate();
                         }
-
+                    }
                 },
                 deselectDice() {
-                    this.dices['selected'] = null;
-                    this.changeCardClass("*", "normal");
-                    this.$forceUpdate();
+                    if (this.turn === this.me['id']) {
+                        this.dices['selected'] = null;
+                        this.changeCardClass("*", "normal");
+                        this.$forceUpdate();
+                    }
                 },
                 checkGame() {
-                    this.gameData(['chat']);
                     if (this.dices['all'] !== []) {
-                        if (this.turn == this.me['id']) { // Si c'est mon TOUR
-                            // this.gameData(['dices', 'turn']); // Rafraichir dés et tour
-                            // this.checkFight();
+                        if (this.turn === this.me['id']) { // Si c'est mon TOUR
+                            this.gameData(['chat']);
+                            this.checkFight();
                         } else { // Si TOUR de l'adversaire
-                            this.gameData(['dices', 'turn', 'opponent', 'me']); // Rafraichir dés, tour, plateau adversaire et moi
+                            this.gameData(['dices', 'turn', 'opponent', 'me', 'chat']); // Rafraichir dés, tour, plateau adversaire et moi
                         }
                     }
                 },
