@@ -65,7 +65,7 @@
                     v-bind:style="{gridColumn: card.column, gridRow: card.row, backgroundImage: 'url(' + card.picture + ')', transform: 'translateY(calc((' + card.row + ' - 1) * -4vw))', zIndex: card.row}"
                     v-bind:class="[card.class]"
                     v-bind:data-type="card.type"
-                    v-on:click="moveCard(card.id)"
+                    v-on:click="clickCard(card.id)"
                     >
                     <div class="card-filter"></div>
                     </li>
@@ -129,156 +129,88 @@
                 fighting: false
             },
             methods: {
-                async gameData(array) {  // array = ["game", "dices", "opponent", ...] -> update la vue
-                    let result = await axios.get(Routing.generate('game_data', {game: '{{ gameId }}'}));
-                    result = result.data;
-                    $.each(array, function (i, data) {
-                        if (data === "game") {
+                gameData(array) {  // array = ["game", "dices", "opponent", ...] -> update la vue
+                    return axios.get(Routing.generate('game_data', {game: '{{ gameId }}'})).then(response => {
+                        result = response.data;
+                        $.each(array, function (i, data) {
+                            if (data === "game") {
 
-                            AMgame.game['id'] = result.gameId;
+                                AMgame.game['id'] = result.gameId;
 
-                        } else if (data === "me") {
+                            } else if (data === "me") {
 
-                            AMgame.me['id'] = result.myId;
-                            AMgame.me['field'] = result.myField;
-                            $.each(AMgame.me['field'], function (index, card) {
-                                card['class'] = "normal";
-                            });
-
-                        } else if (data === "opponent") {
-
-                            AMgame.opponent['id'] = result.opponentId;
-                            AMgame.opponent['field'] = result.opponentField;
-
-                        } else if (data === "dices") {
-
-                            AMgame.dices['all'] = result.dices["dices"];
-                            var playedDices = 0;
-                            $.each(AMgame.dices["all"], function (i, dice) {
-                                if (dice['status'] == 1) {
-                                    playedDices++;
-                                }
-                            });
-                            AMgame.dices['played'] = playedDices;
-
-                        } else if (data === "turn") {
-
-                            AMgame.turn = result.dices["turn"];
-
-                        } else if (data === "chat") {
-
-                            AMgame.game['messages'] = result.chat;
-                            AMgame.scrollMessages();
-
-                        } else if (data === "*") {
-
-                            AMgame.game['id'] = result.gameId;
-                            AMgame.me["id"] = result.myId;
-                            AMgame.me["field"] = result.myField;
-                            $.each(AMgame.me['field'], function (index, card) {
-                                card['class'] = "normal";
-                            });
-                            AMgame.opponent['id'] = result.opponentId;
-                            AMgame.opponent['field'] = result.opponentField;
-                            AMgame.dices["all"] = result.dices["dices"];
-                            var playedDices = 0;
-                            $.each(AMgame.dices["all"], function (i, dice) {
-                                if (dice['status'] == 1) {
-                                    playedDices++;
-                                }
-                            });
-                            AMgame.dices['played'] = playedDices;
-                            AMgame.turn = result.dices["turn"];
-                            AMgame.game['messages'] = result.chat;
-                            AMgame.scrollMessages();
-
-                        }
-                    })
-                },
-                changeDiceStatus(type) {
-                    return axios.get(Routing.generate('game_change_dice_status', {game: this.game['id'], type: type}));
-                },
-                moveCard(id, value = null, user = this.me['id'], dice = true) {
-
-                    if (!this.loading) {
-
-                        if (dice && this.dices['selected'] !== null) { // SI MOUVEMENT Dé
-
-                            this.loading = true;
-
-                            let card = this.me['field'].find(c => c.id === id);
-                            let columnCard = this.sortByKeyAsc($.grep(this.me['field'], function (c) {
-                                return c['column'] === card['column'];
-                            }), 'row');
-
-                            let selectedDice = this.dices['selected'];
-                            value = selectedDice['value'];
-
-                            if (selectedDice.length !== 0 && this.turn === this.me['id'] && (columnCard.length - card['row'] < 3) && (card['type'] === selectedDice['type'] || card['type'] === 4)) {
-                                this.preMoveCard(id, selectedDice['value']);
-                                this.preChangeDiceStatus(selectedDice['type']);
-
-                                axios.get(Routing.generate('game_move_card', {game: this.game['id'], user: user, card: id, value: value})) // MOVE CARD
-                                .then(response => { // 200
-
-                                    this.changeDiceStatus(selectedDice['type']) // CHANGE DICE STATUS
-                                    .then(response => { // 200
-
-                                        this.deselectDice();
-                                        this.dices['played'] ++;
-                                        if (this.dices['played'] === 3) { // SI TOUS LES DES SONT JOUES
-                                            this.turn = this.opponent['id'];
-                                            this.nextTurn().finally(() => {
-                                                this.loading = false;
-                                            })
-                                        } else { // SI DES ENCORE DISPO
-                                            this.gameData(["*"]).finally(() => {
-                                                this.loading = false;
-                                            });
-                                        }
-
-                                    }).catch(error => { // !200
-                                        this.gameData(["*"]);
-                                        console.log("Erreur " + error.response.status);
-                                        this.loading = false;
-                                    });
-
-                                }).catch(error => { // !200
-                                    this.dices['selected'] = selectedDice;
-                                    this.gameData(["*"]);
-                                    console.log("Erreur " + error.response.status);
-                                    this.loading = false;
-                                })
-                            }
-                        } else { // si mouvement en arrière d'un combat à égalité (donc sans dé) ex: this.moveCard(12, -1, false);
-
-                            if (value !== null) {
-
-                                this.loading = true;
-
-                                axios.get(Routing.generate('game_move_card', {game: this.game['id'], user: user, card: id, value: value}))
-                                .then(response => {
-                                    if (response.status === 200) {
-                                        console.log("Carte bougée en arrière");
-                                    } else {
-                                        console.log("Carte pas bougée en arrière");
-                                    }
-                                    this.loading = false;
-                                }).catch(error => {
-                                    console.log("Erreur " + error.response.status);
-                                    this.loading = false;
+                                AMgame.me['id'] = result.myId;
+                                AMgame.me['field'] = result.myField;
+                                $.each(AMgame.me['field'], function (index, card) {
+                                    card['class'] = "normal";
                                 });
 
-                            }
-                        }
+                            } else if (data === "opponent") {
 
-                    }
+                                AMgame.opponent['id'] = result.opponentId;
+                                AMgame.opponent['field'] = result.opponentField;
+
+                            } else if (data === "dices") {
+
+                                AMgame.dices['all'] = result.dices["dices"];
+                                var playedDices = 0;
+                                $.each(AMgame.dices["all"], function (i, dice) {
+                                    if (dice['status'] == 1) {
+                                        playedDices++;
+                                    }
+                                });
+                                AMgame.dices['played'] = playedDices;
+
+                            } else if (data === "turn") {
+
+                                AMgame.turn = result.dices["turn"];
+
+                            } else if (data === "chat") {
+
+                                AMgame.game['messages'] = result.chat;
+                                AMgame.scrollMessages();
+
+                            } else if (data === "*") {
+
+                                AMgame.game['id'] = result.gameId;
+                                AMgame.me["id"] = result.myId;
+                                AMgame.me["field"] = result.myField;
+                                $.each(AMgame.me['field'], function (index, card) {
+                                    card['class'] = "normal";
+                                });
+                                AMgame.opponent['id'] = result.opponentId;
+                                AMgame.opponent['field'] = result.opponentField;
+                                AMgame.dices["all"] = result.dices["dices"];
+                                var playedDices = 0;
+                                $.each(AMgame.dices["all"], function (i, dice) {
+                                    if (dice['status'] == 1) {
+                                        playedDices++;
+                                    }
+                                });
+                                AMgame.dices['played'] = playedDices;
+                                AMgame.turn = result.dices["turn"];
+                                AMgame.game['messages'] = result.chat;
+                                AMgame.scrollMessages();
+
+                            }
+                        })
+                    });
 
                 },
                 nextTurn() {
                     this.deselectDice();
                     this.turn = this.opponent['id'];
                     return axios.get(Routing.generate('game_next_turn', {game: this.game['id']}));
+                },
+                checkGame() {
+                    if (this.dices['all'] !== []) {
+                        if (this.turn === this.me['id']) { // Si c'est mon TOUR
+                            this.gameData(['chat']);
+                            /*this.checkFight();*/
+                        } else { // Si TOUR de l'adversaire
+                            this.gameData(['dices', 'turn', 'opponent', 'me', 'chat']); // Rafraichir dés, tour, plateau adversaire et moi
+                        }
+                    }
                 },
                 checkFight() {
                     console.log("fighting:" + this.fighting);
@@ -309,14 +241,22 @@
                                     if (powerDiff === 0) { // égalité
 
                                         console.log("égalité");
-                                        this.moveCard(myCard['id'], -1, this.me['id'], false).then(() => {
-                                            this.moveCard(opponentCard['id'], -1, this.opponent['id'], false).then(() => {
-                                                this.fighting = false;
+                                        this.moveCard(this.me['id'], myCard['id'], -1).then(() => {
+                                            AMgame.moveCard(this.opponent['id'], opponentCard['id'], -1).then(() => {
+                                                AMgame.fighting = false;
+                                                AMgame.preMoveCard(this.me['id'], myCard['id'], -1);
+                                                AMgame.preMoveCard(this.opponent['id'], opponentCard['id'], -1);
+                                                AMgame.$forceUpdate();
+                                                AMgame.gameData(['*']).finally(function () {
+
+                                                    AMgame.checkFight();
+                                                });
+
                                             });
                                         });
 
-                                        this.gameData(["me", "opponent"]);
-                                        this.checkFight();
+                                        /*this.gameData(["me", "opponent"]);
+                                        this.checkFight();*/
 
                                     } else if (powerDiff === -1 || powerDiff === -2) { // adversaire gagne
 
@@ -361,22 +301,26 @@
                                 }
 
                                 if (looser === this.me['id']) {
-                                    this.deleteCard(myCard['id'])
+                                    this.deleteCard(this.me['id'], myCard['id'])
                                     .then(response => {
-                                        console.log("carte supprimée");
-                                        delete myCard;
-                                        this.$forceUpdate();
-                                        this.gameData(["me", "opponent"]);
-                                        this.fighting = false;
+                                        console.log("carte supprimée " + response.status);
+                                        /*delete myCard;
+                                        this.$forceUpdate();*/
+                                        this.gameData(["me", "opponent"]).finally(function () {
+                                            AMgame.fighting = false;
+                                            AMgame.checkFight();
+                                        });
                                     });
                                 } else if (looser === this.opponent['id']) {
-                                    this.deleteCard(opponentCard['id'])
+                                    this.deleteCard(this.opponent['id'], opponentCard['id'])
                                     .then(response => {
-                                        console.log("carte supprimée");
-                                        delete opponentCard;
-                                        this.$forceUpdate();
-                                        this.gameData(["me", "opponent"]);
-                                        this.fighting = false;
+                                        console.log("carte supprimée" + response.status);
+                                        /*delete opponentCard;
+                                        this.$forceUpdate();*/
+                                        this.gameData(["me", "opponent"]).finally(function () {
+                                            AMgame.fighting = false;
+                                            AMgame.checkFight();
+                                        });
                                     });
                                 }
 
@@ -386,63 +330,118 @@
                         this.fighting = false;
                     }
                 },
-                deleteCard(cardId) {
-                    return axios.get(Routing.generate('game_card_delete', {game: this.game['id'], userid: this.me['id'], cardid: cardId}))
+
+                moveCard(userId, cardId, value) {
+                    return axios.get(Routing.generate('game_move_card', {game: this.game['id'], user: userId, card: cardId, value: value}))
                 },
-                sendMessage() {
-                    let message = {
-                        id: this.me['id'],
-                        message: this.game['message'],
-                        date: new Date()
-                    };
-                    if (this.game['message'] !== "") {
-                        this.preSendMessage(message);
-                        this.game['message'] = "";
-                        return axios.get(Routing.generate('game_message_send', {game: this.game['id'], json: JSON.stringify(message)}));
-                    }
-                },
-                preSendMessage(message) {
-                    this.game['messages'].push(message);
-                    this.$forceUpdate();
-                },
-
-                preMoveCard(id, value) {
-
-                    let selectedCard = this.me['field'].find(c => c.id === id);
-
-                    let currentRow = selectedCard['row'];
-                    let currentColumn = selectedCard['column'];
-
-                    let cardsToMove = this.sortByKeyAsc(this.me['field'].filter(function (obj) {
-                        return obj.column === currentColumn && obj.row >= currentRow;
-                    }), 'row');
-
-                    if (cardsToMove.length <= 3) {
-
-                        let nextColumn = selectedCard['column'] + value;
-                        if (nextColumn > 11) { nextColumn = 11; }
-
-                        let cardsOnNextColumn = this.sortByKeyAsc($.grep(this.me['field'], function (card) {
-                            return card['column'] === nextColumn;
+                preMoveCard(userId, cardId, value) {
+                    if (userId == this.me['id']) {
+                        let selectedCard = this.me['field'].find(c => c.id === cardId);
+                        let currentRow = selectedCard['row'];
+                        let currentColumn = selectedCard['column'];
+                        let cardsToMove = this.sortByKeyAsc(this.me['field'].filter(function (obj) {
+                            return obj.column === currentColumn && obj.row >= currentRow;
                         }), 'row');
-                        let firstRowOfNextColumn = cardsOnNextColumn.length + 1;
+                        if (cardsToMove.length <= 3) {
 
-                        $.each(cardsToMove, function (index, card) {
-                            card['column'] = nextColumn;
-                            card['row'] = card['row'] - currentRow + firstRowOfNextColumn;
-                        });
+                            let nextColumn = selectedCard['column'] + value;
+                            if (nextColumn > 11) { nextColumn = 11; }
 
+                            let cardsOnNextColumn = this.sortByKeyAsc($.grep(this.me['field'], function (card) {
+                                return card['column'] === nextColumn;
+                            }), 'row');
+                            let firstRowOfNextColumn = cardsOnNextColumn.length + 1;
+
+                            $.each(cardsToMove, function (index, card) {
+                                card['column'] = nextColumn;
+                                card['row'] = card['row'] - currentRow + firstRowOfNextColumn;
+                            });
+
+                        }
+                    } else {
+                        let selectedCard = this.opponent['field'].find(c => c.id === cardId);
+                        let currentRow = selectedCard['row'];
+                        let currentColumn = selectedCard['column'];
+                        let cardsToMove = this.sortByKeyAsc(this.opponent['field'].filter(function (obj) {
+                            return obj.column === currentColumn && obj.row >= currentRow;
+                        }), 'row');
+                        if (cardsToMove.length <= 3) {
+
+                            let nextColumn = selectedCard['column'] + value;
+                            if (nextColumn > 11) { nextColumn = 11; }
+
+                            let cardsOnNextColumn = this.sortByKeyAsc($.grep(this.opponent['field'], function (card) {
+                                return card['column'] === nextColumn;
+                            }), 'row');
+                            let firstRowOfNextColumn = cardsOnNextColumn.length + 1;
+
+                            $.each(cardsToMove, function (index, card) {
+                                card['column'] = nextColumn;
+                                card['row'] = card['row'] - currentRow + firstRowOfNextColumn;
+                            });
+
+                        }
                     }
 
 
-                },
-                preChangeDiceStatus(type) {
-                    let dice = this.dices['all'].find(d => d.type === type);
-                    dice['status'] = 1;
-                    this.dices['selected'] = null;
-                    this.$forceUpdate();
-                },
 
+
+                },
+                clickCard(cardId, userId = this.me['id'], dice = this.dices['selected']) {
+                    if (!this.loading) {
+                        if (this.dices['selected'] !== null) {
+                            this.loading = true;
+                            let card = this.me['field'].find(c => c.id === cardId);
+                            let columnCard = this.sortByKeyAsc($.grep(this.me['field'], function (c) {
+                                return c['column'] === card['column'];
+                            }), 'row');
+
+                            let value = dice['value'];
+
+                            if (dice.length !== 0 && this.turn === this.me['id'] && (columnCard.length - card['row'] < 3) && (card['type'] === dice['type'] || card['type'] === 4)) {
+                                this.preMoveCard(userId, cardId, dice['value']);
+                                this.preChangeDiceStatus(dice['type']);
+
+                                this.moveCard(userId, cardId, value) // MOVE CARD
+                                .then(response => { // 200
+                                    this.deselectDice();
+                                    this.changeDiceStatus(dice['type']) // CHANGE DICE STATUS
+                                    .then(response => { // 200
+                                        this.dices['played'] ++;
+                                        if (this.dices['played'] >= 3) { // SI TOUS LES DES SONT JOUES
+                                            this.turn = this.opponent['id'];
+                                            this.nextTurn().finally(() => {
+                                                this.gameData(["*"]);
+                                                this.loading = false;
+                                            })
+                                        } else { // SI DES ENCORE DISPO
+                                            this.gameData(["*"]).finally(() => {
+                                                this.loading = false;
+                                            });
+                                        }
+                                        this.checkFight();
+                                    }).catch(error => { // !200
+                                        this.gameData(["*"]);
+                                        console.log("Erreur " + error.status);
+                                        this.loading = false;
+                                    });
+                                }).catch(error => { // !200
+                                    this.dices['selected'] = dice;
+                                    this.gameData(["*"]);
+                                    console.log("Erreur " + error.status);
+                                    this.loading = false;
+                                })
+                            }
+
+                        } else {
+                            console.log("Aucun dé sélectionné");
+                        }
+
+                    }
+                },
+                deleteCard(userId, cardId) {
+                    return axios.get(Routing.generate('game_card_delete', {game: this.game['id'], userid: userId, cardid: cardId}))
+                },
                 changeCardClass(id, classname) {
                     if (id === "*") {
                         $.each(this.me['field'], function (index, card) {
@@ -456,7 +455,6 @@
                 },
 
                 selectDice(type) {
-                    console.log(this.loading);
                     if (this.turn === this.me['id'] && !this.loading) {
                         var selectedDice = this.dices['all'].find(d => d.type === type);
                         if (selectedDice['status'] === 0) {
@@ -489,15 +487,38 @@
                         this.$forceUpdate();
                     }
                 },
-                checkGame() {
-                    if (this.dices['all'] !== []) {
-                        if (this.turn === this.me['id']) { // Si c'est mon TOUR
-                            this.gameData(['chat']);
-                            this.checkFight();
-                        } else { // Si TOUR de l'adversaire
-                            this.gameData(['dices', 'turn', 'opponent', 'me', 'chat']); // Rafraichir dés, tour, plateau adversaire et moi
-                        }
+                changeDiceStatus(type) {
+                    return axios.get(Routing.generate('game_change_dice_status', {game: this.game['id'], type: type}));
+                },
+                preChangeDiceStatus(type) {
+                    let dice = this.dices['all'].find(d => d.type === type);
+                    dice['status'] = 1;
+                    this.dices['selected'] = null;
+                    this.$forceUpdate();
+                },
+
+                sendMessage() {
+                    let message = {
+                        id: this.me['id'],
+                        message: this.game['message'],
+                        date: new Date()
+                    };
+                    if (this.game['message'] !== "") {
+                        this.preSendMessage(message);
+                        this.game['message'] = "";
+                        return axios.get(Routing.generate('game_message_send', {game: this.game['id'], json: JSON.stringify(message)}));
                     }
+                },
+                preSendMessage(message) {
+                    this.game['messages'].push(message);
+                    this.$forceUpdate();
+                },
+                scrollMessages() {
+                    let sm = 0;
+                    $('.messages li').each(function (index) {
+                        sm += $(this).height();
+                    });
+                    $('.messages').scrollTop(sm);
                 },
 
                 sortByKeyDesc(array, key) {
@@ -512,16 +533,12 @@
                         return ((x < y) ? -1 : ((x > y) ? 1 : 0));
                     });
                 },
-                scrollMessages() {
-                    let sm = 0;
-                    $('.messages li').each(function (index) {
-                        sm += $(this).height();
-                    });
-                    $('.messages').scrollTop(sm);
-                }
+
             },
-            created() {
-                this.gameData(["*"]);
+            mounted() {
+                this.gameData(["*"]).finally(function () {
+                    AMgame.checkFight();
+                });
                 setInterval(this.checkGame, 2000);
                 setTimeout(this.scrollMessages, 3000);
             }
