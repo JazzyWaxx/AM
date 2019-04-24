@@ -27,6 +27,21 @@
 
             <ul class="dice">
                 <li v-for="dice in dices['all']" v-on:click="selectDice(dice['type'])" v-bind:class="'dice'+dice['type']" >
+                    <div v-if="dice['type'] == 1">
+                    {% endverbatim %}
+                        <img src="{{ asset('assets/img/game/types/testament.svg') }}" alt="">
+                        {% verbatim %}
+                    </div>
+                    <div v-if="dice['type'] == 2">
+                        {% endverbatim %}
+                        <img src="{{ asset('assets/img/game/types/scissor.svg') }}" alt="">
+                        {% verbatim %}
+                    </div>
+                    <div v-if="dice['type'] == 3">
+                        {% endverbatim %}
+                        <img src="{{ asset('assets/img/game/types/diamond.svg') }}" alt="">
+                        {% verbatim %}
+                    </div>
                     <div v-if="dice['status'] ==  0">{{ dice['value'] }}</div>
                     <div v-else class="played">{{ dice['value'] }}</div>
                 </li>
@@ -206,14 +221,13 @@
                     if (this.dices['all'] !== []) {
                         if (this.turn === this.me['id']) { // Si c'est mon TOUR
                             this.gameData(['chat']);
-                            /*this.checkFight();*/
                         } else { // Si TOUR de l'adversaire
                             this.gameData(['dices', 'turn', 'opponent', 'me', 'chat']); // Rafraichir dés, tour, plateau adversaire et moi
                         }
                     }
                 },
                 checkFight() {
-                    console.log("fighting:" + this.fighting);
+                    console.log("checking fight");
                     if (!this.fighting) {
                         this.fighting = true;
                         for (i = 1; i <= 11; i++) {
@@ -243,20 +257,16 @@
                                         console.log("égalité");
                                         this.moveCard(this.me['id'], myCard['id'], -1).then(() => {
                                             AMgame.moveCard(this.opponent['id'], opponentCard['id'], -1).then(() => {
+                                                AMgame.preMoveCard(AMgame.me['id'], myCard['id'], -1);
+                                                AMgame.preMoveCard(AMgame.opponent['id'], opponentCard['id'], -1);
                                                 AMgame.fighting = false;
-                                                AMgame.preMoveCard(this.me['id'], myCard['id'], -1);
-                                                AMgame.preMoveCard(this.opponent['id'], opponentCard['id'], -1);
-                                                AMgame.$forceUpdate();
                                                 AMgame.gameData(['*']).finally(function () {
-
+                                                    console.log("données du jeu mises à jour");
+                                                    AMgame.fighting = false;
                                                     AMgame.checkFight();
                                                 });
-
                                             });
                                         });
-
-                                        /*this.gameData(["me", "opponent"]);
-                                        this.checkFight();*/
 
                                     } else if (powerDiff === -1 || powerDiff === -2) { // adversaire gagne
 
@@ -304,8 +314,6 @@
                                     this.deleteCard(this.me['id'], myCard['id'])
                                     .then(response => {
                                         console.log("carte supprimée " + response.status);
-                                        /*delete myCard;
-                                        this.$forceUpdate();*/
                                         this.gameData(["me", "opponent"]).finally(function () {
                                             AMgame.fighting = false;
                                             AMgame.checkFight();
@@ -314,9 +322,7 @@
                                 } else if (looser === this.opponent['id']) {
                                     this.deleteCard(this.opponent['id'], opponentCard['id'])
                                     .then(response => {
-                                        console.log("carte supprimée" + response.status);
-                                        /*delete opponentCard;
-                                        this.$forceUpdate();*/
+                                        console.log("carte supprimée " + response.status);
                                         this.gameData(["me", "opponent"]).finally(function () {
                                             AMgame.fighting = false;
                                             AMgame.checkFight();
@@ -335,7 +341,8 @@
                     return axios.get(Routing.generate('game_move_card', {game: this.game['id'], user: userId, card: cardId, value: value}))
                 },
                 preMoveCard(userId, cardId, value) {
-                    if (userId == this.me['id']) {
+                    if (userId === this.me['id']) {
+                        console.log("premoving my card");
                         let selectedCard = this.me['field'].find(c => c.id === cardId);
                         let currentRow = selectedCard['row'];
                         let currentColumn = selectedCard['column'];
@@ -359,6 +366,7 @@
 
                         }
                     } else {
+                        console.log("premoving opponent card");
                         let selectedCard = this.opponent['field'].find(c => c.id === cardId);
                         let currentRow = selectedCard['row'];
                         let currentColumn = selectedCard['column'];
@@ -383,7 +391,7 @@
                         }
                     }
 
-
+                    this.$forceUpdate();
 
 
                 },
@@ -458,7 +466,6 @@
                     if (this.turn === this.me['id'] && !this.loading) {
                         var selectedDice = this.dices['all'].find(d => d.type === type);
                         if (selectedDice['status'] === 0) {
-                            console.log('dé sélectionné');
                             this.changeCardClass("*", "unplayable");
                             for (let i = 1; i <= 11; i++) {
                                 var myColumn = this.sortByKeyAsc($.grep(this.me['field'], function (card) {
